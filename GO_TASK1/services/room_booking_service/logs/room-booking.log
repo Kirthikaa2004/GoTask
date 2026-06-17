@@ -1,0 +1,274 @@
+{"level":"info","timestamp":"2026-05-26T09:16:09.794+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T09:16:09.796+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"error","timestamp":"2026-05-26T09:16:09.852+0530","service":"room-booking-service","caller":"server/server.go:41","message":"Failed to connect to database","error":"unable to open tcp connection with host 'localhost:1433': dial tcp 127.0.0.1:1433: connectex: No connection could be made because the target machine actively refused it."}
+{"level":"info","timestamp":"2026-05-26T09:25:59.859+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T09:25:59.859+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T09:26:00.285+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T09:26:00.286+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T09:26:00.614+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T09:26:00.614+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"error","timestamp":"2026-05-26T09:29:52.778+0530","service":"room-booking-service","caller":"services/booking_service.go:51","message":"ReserveRoom: room lookup failed","error":"room 1 not found or inactive"}
+{"level":"error","timestamp":"2026-05-26T11:58:59.498+0530","service":"room-booking-service","caller":"repository/booking_repository.go:182","message":"GetRoomByBookingID failed","bookingID":"1","error":"ERROR: invalid input syntax for type uuid: \"1\" (SQLSTATE 22P02)"}
+{"level":"error","timestamp":"2026-05-26T11:58:59.502+0530","service":"room-booking-service","caller":"services/booking_service.go:197","message":"GetRoomByBookingID failed","bookingID":"1","error":"ERROR: invalid input syntax for type uuid: \"1\" (SQLSTATE 22P02)"}
+{"level":"info","timestamp":"2026-05-26T12:07:29.608+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:07:29.608+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:07:29.861+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:07:29.861+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:07:30.100+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:07:30.100+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:10:37.749+0530","service":"room-booking-service","caller":"services/booking_service.go:77","message":"Price calculated","days":1,"room_price":1500,"total_price":1500}
+{"level":"info","timestamp":"2026-05-26T12:10:37.753+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"No existing customer, creating new record","phone":"9876543210"}
+{"level":"info","timestamp":"2026-05-26T12:10:37.770+0530","service":"room-booking-service","caller":"services/booking_service.go:138","message":"Room reserved successfully","booking_uuid":"26cf55a2-3a16-4ba1-9c93-bcf98bbd03eb","room_id":1,"customer_id":1,"total_price":1500}
+{"level":"info","timestamp":"2026-05-26T12:22:30.311+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:22:30.312+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:22:30.604+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:22:30.604+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:22:30.952+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:22:30.952+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:24:18.231+0530","service":"room-booking-service","caller":"services/booking_service.go:77","message":"Price calculated","days":1,"room_price":5000,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T12:24:18.234+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"No existing customer, creating new record","phone":"9012345678"}
+{"level":"info","timestamp":"2026-05-26T12:24:18.244+0530","service":"room-booking-service","caller":"services/booking_service.go:138","message":"Room reserved successfully","booking_uuid":"ffe700b9-3d36-4694-9c91-46a84e3a762a","room_id":4,"customer_id":2,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T12:28:40.107+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:28:40.107+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:28:40.361+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:28:40.361+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:28:40.566+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:28:40.567+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:29:17.624+0530","service":"room-booking-service","caller":"services/booking_service.go:77","message":"Price calculated","days":1,"room_price":1500,"total_price":1500}
+{"level":"info","timestamp":"2026-05-26T12:29:18.004+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"No existing customer, creating new record","phone":"9345678901"}
+{"level":"info","timestamp":"2026-05-26T12:29:18.576+0530","service":"room-booking-service","caller":"services/booking_service.go:138","message":"Room reserved successfully","booking_uuid":"76cabe52-cd89-4571-b04b-1a0a445dea4c","room_id":1,"customer_id":3,"total_price":1500}
+{"level":"info","timestamp":"2026-05-26T12:31:23.484+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:31:23.485+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:31:23.742+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:31:23.743+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:31:23.977+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:31:23.978+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:31:33.810+0530","service":"room-booking-service","caller":"services/booking_service.go:77","message":"Price calculated","days":2,"room_price":2500,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T12:31:33.815+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"No existing customer, creating new record","phone":"9387654321"}
+{"level":"info","timestamp":"2026-05-26T12:31:33.829+0530","service":"room-booking-service","caller":"services/booking_service.go:139","message":"Room reserved successfully","booking_uuid":"028b7aeb-bcef-452a-9671-e35ce1a7087a","room_id":2,"customer_id":4,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T12:33:58.441+0530","service":"room-booking-service","caller":"services/booking_service.go:77","message":"Price calculated","days":2,"room_price":5000,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T12:33:58.443+0530","service":"room-booking-service","caller":"services/booking_service.go:94","message":"Existing customer found, reusing record","phone":"9876543210","customer_id":1}
+{"level":"info","timestamp":"2026-05-26T12:33:58.445+0530","service":"room-booking-service","caller":"services/booking_service.go:139","message":"Room reserved successfully","booking_uuid":"0b5bef8f-2955-4b90-88b0-60ec7d71ad58","room_id":4,"customer_id":1,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T12:40:19.731+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:40:19.732+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:40:19.991+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:40:19.991+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:40:20.241+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:40:20.241+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:46:42.221+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T12:46:42.222+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T12:46:42.476+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T12:46:42.477+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T12:46:42.690+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T12:46:42.690+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T12:47:22.433+0530","service":"room-booking-service","caller":"services/booking_service.go:156","message":"Booking cancelled","bookingID":"{26cf55a2-3a16-4ba1-9c93-bcf98bbd03eb}"}
+{"level":"info","timestamp":"2026-05-26T13:01:57.074+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T13:01:57.075+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T13:01:57.388+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T13:01:57.388+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T13:01:57.620+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T13:01:57.620+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T15:26:17.247+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T15:26:17.248+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T15:26:17.579+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T15:26:17.579+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T15:26:18.031+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T15:26:18.031+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T15:29:38.213+0530","service":"room-booking-service","caller":"services/booking_service.go:68","message":"Price calculated","days":1,"room_price":7000,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T15:29:38.216+0530","service":"room-booking-service","caller":"services/booking_service.go:93","message":"No existing customer, creating new record","phone":"9677709983"}
+{"level":"info","timestamp":"2026-05-26T15:29:38.244+0530","service":"room-booking-service","caller":"services/booking_service.go:128","message":"Room reserved successfully","booking_uuid":"648ade23-c5d2-47ee-9f58-030967a97f36","room_id":5,"customer_id":5,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T15:42:47.359+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T15:42:47.360+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T15:42:47.590+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T15:42:47.591+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T15:42:47.769+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T15:42:47.769+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T15:43:51.666+0530","service":"room-booking-service","caller":"services/booking_service.go:68","message":"Price calculated","days":1,"room_price":3500,"total_price":3500}
+{"level":"info","timestamp":"2026-05-26T15:43:51.667+0530","service":"room-booking-service","caller":"services/booking_service.go:93","message":"No existing customer, creating new record","phone":"9677709903"}
+{"level":"info","timestamp":"2026-05-26T15:43:51.673+0530","service":"room-booking-service","caller":"services/booking_service.go:128","message":"Room reserved successfully","booking_uuid":"19718776-4b54-428b-9eb4-755147629393","room_id":3,"customer_id":6,"total_price":3500}
+{"level":"info","timestamp":"2026-05-26T15:50:34.902+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T15:50:34.904+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T15:50:35.331+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T15:50:35.337+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T15:50:35.674+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T15:50:35.676+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T15:57:24.245+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T15:57:24.246+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T15:57:24.570+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T15:57:24.571+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T15:57:25.003+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T15:57:25.003+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T16:12:41.159+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T16:12:41.160+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T16:12:41.388+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T16:12:41.389+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T16:12:41.758+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T16:12:41.758+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T16:48:53.184+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T16:48:53.185+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T16:48:53.563+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T16:48:53.563+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T16:48:53.994+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T16:48:53.994+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T17:04:52.683+0530","service":"room-booking-service","caller":"services/booking_service.go:85","message":"Price calculated","days":2,"room_price":3500,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T17:04:52.687+0530","service":"room-booking-service","caller":"services/booking_service.go:110","message":"No existing customer, creating new record","phone":"9123456780"}
+{"level":"info","timestamp":"2026-05-26T17:04:52.710+0530","service":"room-booking-service","caller":"services/booking_service.go:145","message":"Room reserved successfully","booking_uuid":"9cdc08ba-a937-4217-b703-787adba12c0b","room_id":3,"customer_id":7,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T17:18:14.805+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T17:18:14.805+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T17:18:15.134+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T17:18:15.134+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T17:18:15.512+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T17:18:15.513+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T17:29:42.004+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T17:29:42.004+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T17:29:42.449+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T17:29:42.450+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T17:29:42.824+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T17:29:42.824+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T17:31:23.012+0530","service":"room-booking-service","caller":"services/booking_service.go:85","message":"Price calculated","days":1,"room_price":5000,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T17:31:23.014+0530","service":"room-booking-service","caller":"services/booking_service.go:110","message":"No existing customer, creating new record","phone":"8883456789"}
+{"level":"info","timestamp":"2026-05-26T17:31:23.028+0530","service":"room-booking-service","caller":"services/booking_service.go:145","message":"Room reserved successfully","booking_uuid":"283cafa9-0630-45a5-b558-a2a48f5a5647","room_id":4,"customer_id":8,"total_price":5000}
+{"level":"info","timestamp":"2026-05-26T17:44:26.495+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T17:44:26.496+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T17:44:26.732+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T17:44:26.732+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T17:44:27.353+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T17:44:27.353+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T17:48:36.251+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T17:48:36.251+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T17:48:36.495+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T17:48:36.495+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T17:48:36.722+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T17:48:36.722+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T17:50:12.144+0530","service":"room-booking-service","caller":"services/booking_service.go:177","message":"Booking cancelled","bookingID":"283cafa9-0630-45a5-b558-a2a48f5a5647"}
+{"level":"error","timestamp":"2026-05-26T17:50:58.211+0530","service":"room-booking-service","caller":"services/booking_service.go:166","message":"CancelBooking failed","bookingID":"283cafa9-0630-45a5-b558-a2a48f5a5647","error":"booking 283cafa9-0630-45a5-b558-a2a48f5a5647 not found or already cancelled"}
+{"level":"info","timestamp":"2026-05-26T17:58:08.350+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T17:58:08.351+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T17:58:08.670+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T17:58:08.670+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T17:58:09.020+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T17:58:09.020+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T18:02:09.971+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T18:02:09.971+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T18:02:10.338+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T18:02:10.338+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T18:02:10.601+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T18:02:10.601+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T18:19:19.068+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T18:19:19.071+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T18:19:19.423+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T18:19:19.423+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T18:19:19.783+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T18:19:19.784+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"error","timestamp":"2026-05-26T18:20:36.302+0530","service":"room-booking-service","caller":"services/booking_service.go:166","message":"CancelBooking failed","bookingID":"283cafa9-0630-45a5-b558-a2a48f5a5647","error":"booking 283cafa9-0630-45a5-b558-a2a48f5a5647 not found or already cancelled"}
+{"level":"error","timestamp":"2026-05-26T18:21:11.521+0530","service":"room-booking-service","caller":"services/booking_service.go:166","message":"CancelBooking failed","bookingID":"283cafa9-0630-45a5-b558-a2a48f5a5647","error":"booking 283cafa9-0630-45a5-b558-a2a48f5a5647 not found or already cancelled"}
+{"level":"info","timestamp":"2026-05-26T18:22:00.796+0530","service":"room-booking-service","caller":"services/booking_service.go:177","message":"Booking cancelled","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a"}
+{"level":"info","timestamp":"2026-05-26T18:24:16.157+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T18:24:16.157+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T18:24:16.539+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T18:24:16.539+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T18:24:16.760+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T18:24:16.760+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T18:35:03.252+0530","service":"room-booking-service","caller":"services/booking_service.go:85","message":"Price calculated","days":2,"room_price":5000,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T18:35:03.254+0530","service":"room-booking-service","caller":"services/booking_service.go:101","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-05-26T18:35:03.261+0530","service":"room-booking-service","caller":"services/booking_service.go:145","message":"Room reserved successfully","booking_uuid":"473d5f96-8a55-409b-895a-f725a00ef27e","room_id":4,"customer_id":7,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T18:47:16.671+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T18:47:16.672+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T18:47:17.015+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T18:47:17.015+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T18:47:17.389+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T18:47:17.389+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T18:47:41.955+0530","service":"room-booking-service","caller":"services/booking_service.go:86","message":"Price calculated","days":2,"room_price":5000,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T18:47:41.959+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-05-26T18:47:41.964+0530","service":"room-booking-service","caller":"services/booking_service.go:145","message":"Room reserved successfully","booking_uuid":"cc07d129-9d51-4a3a-b573-b907dcb5e44e","room_id":4,"customer_id":7,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T18:54:38.203+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T18:54:38.206+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T18:54:38.665+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T18:54:38.665+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T18:54:39.008+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T18:54:39.008+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-26T18:55:17.862+0530","service":"room-booking-service","caller":"services/booking_service.go:86","message":"Price calculated","days":2,"room_price":5000,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T18:55:17.865+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-05-26T18:55:17.870+0530","service":"room-booking-service","caller":"services/booking_service.go:146","message":"Room reserved successfully","booking_uuid":"1fb899af-0a03-46cf-9307-4620eb2ad4b8","room_id":4,"customer_id":7,"total_price":10000}
+{"level":"info","timestamp":"2026-05-26T19:04:03.831+0530","service":"room-booking-service","caller":"services/booking_service.go:86","message":"Price calculated","days":2,"room_price":3500,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T19:04:03.832+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-05-26T19:04:03.838+0530","service":"room-booking-service","caller":"services/booking_service.go:146","message":"Room reserved successfully","booking_uuid":"ba389b23-8a2a-4119-933b-0c961a55c16f","room_id":3,"customer_id":7,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T19:04:31.136+0530","service":"room-booking-service","caller":"services/booking_service.go:86","message":"Price calculated","days":2,"room_price":3500,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T19:04:31.138+0530","service":"room-booking-service","caller":"services/booking_service.go:103","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-05-26T19:04:31.140+0530","service":"room-booking-service","caller":"services/booking_service.go:146","message":"Room reserved successfully","booking_uuid":"a28a1d75-44d5-4244-b27d-5964a9c0f9d3","room_id":3,"customer_id":7,"total_price":7000}
+{"level":"info","timestamp":"2026-05-26T19:09:17.413+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T19:09:17.413+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T19:09:17.629+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T19:09:17.629+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T19:09:17.801+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T19:09:17.801+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"error","timestamp":"2026-05-26T19:09:32.135+0530","service":"room-booking-service","caller":"services/booking_service.go:208","message":"GetRoomByBookingID failed","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a","error":"booking ffe700b9-3d36-4694-9c91-46a84e3a762a not found"}
+{"level":"info","timestamp":"2026-05-26T19:17:07.853+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-26T19:17:07.854+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-26T19:17:08.215+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-26T19:17:08.215+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-26T19:17:08.372+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-26T19:17:08.372+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-27T12:09:51.428+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T12:09:51.430+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T12:09:51.858+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T12:09:51.858+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T12:09:52.472+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T12:09:52.472+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"error","timestamp":"2026-05-27T12:11:53.886+0530","service":"room-booking-service","caller":"services/booking_service.go:59","message":"ReserveRoom: room lookup failed","error":"room 6 not found or inactive"}
+{"level":"error","timestamp":"2026-05-27T12:14:56.429+0530","service":"room-booking-service","caller":"services/booking_service.go:158","message":"CancelBooking failed","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a","error":"booking ffe700b9-3d36-4694-9c91-46a84e3a762a not found or already cancelled"}
+{"level":"error","timestamp":"2026-05-27T12:15:28.580+0530","service":"room-booking-service","caller":"services/booking_service.go:158","message":"CancelBooking failed","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a","error":"booking ffe700b9-3d36-4694-9c91-46a84e3a762a not found or already cancelled"}
+{"level":"error","timestamp":"2026-05-27T12:17:56.690+0530","service":"room-booking-service","caller":"services/booking_service.go:208","message":"GetRoomByBookingID failed","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a","error":"booking ffe700b9-3d36-4694-9c91-46a84e3a762a not found"}
+{"level":"info","timestamp":"2026-05-27T19:04:03.090+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T19:04:03.091+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T19:04:03.480+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T19:04:03.480+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T19:04:03.911+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T19:04:03.911+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-27T19:29:25.505+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T19:29:25.506+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T19:29:25.827+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T19:29:25.828+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T19:29:26.160+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T19:29:26.162+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-27T19:30:41.985+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T19:30:41.985+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T19:30:42.255+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T19:30:42.255+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T19:30:42.457+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T19:30:42.457+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"warn","timestamp":"2026-05-27T19:31:45.394+0530","service":"room-booking-service","caller":"handlers/booking_handler.go:44","message":"ReserveRoom: invalid request body","error":"invalid character ',' looking for beginning of value"}
+{"level":"error","timestamp":"2026-05-27T19:34:44.914+0530","service":"room-booking-service","caller":"services/booking_service.go:158","message":"CancelBooking failed","bookingID":"ffe700b9-3d36-4694-9c91-46a84e3a762a","error":"booking ffe700b9-3d36-4694-9c91-46a84e3a762a not found or already cancelled"}
+{"level":"info","timestamp":"2026-05-27T19:35:38.968+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T19:35:38.969+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T19:35:39.264+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T19:35:39.265+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T19:35:39.451+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T19:35:39.451+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-27T19:47:36.886+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-27T19:47:36.886+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-27T19:47:37.175+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-27T19:47:37.175+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-27T19:47:37.623+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-27T19:47:37.624+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-05-28T13:21:19.498+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-05-28T13:21:19.499+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-05-28T13:21:19.815+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-05-28T13:21:19.815+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-05-28T13:21:20.246+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-05-28T13:21:20.247+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"info","timestamp":"2026-06-01T14:32:30.231+0530","service":"room-booking-service","caller":"server/server.go:34","message":"Logger initialized"}
+{"level":"info","timestamp":"2026-06-01T14:32:30.232+0530","service":"room-booking-service","caller":"server/server.go:37","message":"Initializing database connection"}
+{"level":"info","timestamp":"2026-06-01T14:32:30.674+0530","service":"room-booking-service","caller":"server/server.go:44","message":"Database connection established successfully"}
+{"level":"info","timestamp":"2026-06-01T14:32:30.674+0530","service":"room-booking-service","caller":"database/migration.go:18","message":"Running database migration..."}
+{"level":"info","timestamp":"2026-06-01T14:32:31.224+0530","service":"room-booking-service","caller":"database/migration.go:30","message":"Database migration completed successfully"}
+{"level":"info","timestamp":"2026-06-01T14:32:31.224+0530","service":"room-booking-service","caller":"server/server.go:72","message":"Starting server on port","port":"8080"}
+{"level":"warn","timestamp":"2026-06-01T14:35:25.440+0530","service":"room-booking-service","caller":"handlers/booking_handler.go:44","message":"ReserveRoom: invalid request body","error":"json: cannot unmarshal number into Go struct field CreateBookingRequest.name of type string"}
+{"level":"info","timestamp":"2026-06-01T14:36:06.706+0530","service":"room-booking-service","caller":"services/booking_service.go:81","message":"Price calculated","days":2,"room_price":5000,"total_price":10000}
+{"level":"info","timestamp":"2026-06-01T14:36:06.742+0530","service":"room-booking-service","caller":"services/booking_service.go:97","message":"Existing customer found, reusing record","phone":"9123456780","customer_id":7}
+{"level":"info","timestamp":"2026-06-01T14:36:06.923+0530","service":"room-booking-service","caller":"services/booking_service.go:138","message":"Room reserved successfully","booking_uuid":"5c963e34-d5b0-45c7-a393-52c3df711537","room_id":4,"customer_id":7,"total_price":10000}
+{"level":"error","timestamp":"2026-06-01T14:37:38.272+0530","service":"room-booking-service","caller":"services/booking_service.go:208","message":"GetRoomByBookingID failed","bookingID":"11111111-aaaa-4a11-9f1a-111111111111","error":"booking 11111111-aaaa-4a11-9f1a-111111111111 not found"}
+{"level":"info","timestamp":"2026-06-01T14:39:56.219+0530","service":"room-booking-service","caller":"services/booking_service.go:81","message":"Price calculated","days":3,"room_price":7000,"total_price":21000}
+{"level":"info","timestamp":"2026-06-01T14:39:56.220+0530","service":"room-booking-service","caller":"services/booking_service.go:102","message":"No existing customer, creating new record","phone":"9123456788"}
+{"level":"info","timestamp":"2026-06-01T14:39:56.237+0530","service":"room-booking-service","caller":"services/booking_service.go:138","message":"Room reserved successfully","booking_uuid":"73465dc3-db72-477c-b599-0f286f5ad28a","room_id":5,"customer_id":9,"total_price":21000}
+{"level":"info","timestamp":"2026-06-01T14:51:28.714+0530","service":"room-booking-service","caller":"services/booking_service.go:169","message":"Booking cancelled","bookingID":"76cabe52-cd89-4571-b04b-1a0a445dea4c"}

@@ -1,0 +1,553 @@
+@startuml  Room Booking Management
+autonumber
+skinparam maxMessageSize 300
+autoactivate off
+
+title Room Booking Management
+
+actor Client 
+
+participant "Main" as Main
+participant "Server\n(InitializeApp)" as Server
+participant "Config\n(LoadConfig)" as Config
+participant "Migration\n(AutoMigrate)" as Migration
+participant "Logger" as Logger
+participant "Router\n(mux.Router)" as Router
+participant "ReservationHandler" as Handler
+participant "Utils" as Utils
+participant "ReservationService" as Service
+participant "ReservationRepository" as Repo
+participant "Database\n(DBService)" as DB
+
+note over Main
+package main
+import "room_booking_management/room_booking_service/pkg/server"
+import "fmt"
+import "os"
+import "flag"
+end note
+
+note over Server
+package server
+import "net/http"
+import "room_booking_management/room_booking_service/internal/config"
+import "room_booking_management/room_booking_service/internal/handlers"
+import "room_booking_management/room_booking_service/internal/loggers"
+import "github.com/gorilla/mux"
+import "github.com/rs/cors"
+end note
+
+note over Config
+import "os"
+import "fmt"
+import "github.com/joho/godotenv"
+end note
+
+
+note over Migration
+import "room_booking_management/room_booking_service/internal/models"
+import "room_booking_management/room_booking_service/internal/loggers"
+end note
+
+note over Logger
+import "fmt"
+import "time"
+end note
+
+note over Router
+import "net/http"
+import "room_booking_management/room_booking_service/internal/config"
+import "room_booking_management/room_booking_service/internal/loggers"
+import "room_booking_management/room_booking_service/internal/services"
+import "github.com/gorilla/mux"
+end note
+
+note over Handler
+package handler
+import "encoding/json"
+import "net/http"
+import "context"
+import "room_booking_management/room_booking_service/internal/dtos"
+import "room_booking_management/room_booking_service/internal/service"
+import "room_booking_management/room_booking_service/internal/utils"
+import "room_booking_management/room_booking_service/internal/logger"
+end note
+
+note over Utils
+import "encoding/json"
+import "fmt"
+import "room_booking_management/room_booking_service/internal/dtos"
+import "room_booking_management/room_booking_service/internal/errorcodes"
+import "net/http"
+import "github.com/go-playground/validator/v10"
+end note
+
+note over Service
+package services
+import "room_booking_management/room_booking_service/internal/repository"
+import "room_booking_management/room_booking_service/internal/models"
+import "github.com/google/uuid"
+end note
+
+note over Repo
+package repository
+import "gorm.io/gorm"
+import "room_booking_management/room_booking_service/pkg/database"
+import "room_booking_management/room_booking_service/internal/models"
+end note
+
+note over DB 
+import "database/sql"
+import "strings"
+import "github.com/microsoft/go-mssqldb"
+import "github.com/mattn/go-sqlite3"
+import "gorm.io/driver/sqlite"
+import "gorm.io/driver/sqlserver"
+import "gorm.io/gorm"
+end note
+
+== Application Startup ==
+
+group Main()
+activate Main
+    Main->Main: use flag.String() and define the name env for it and provide the default name as dev and provide description message as Environment(dev,qc,uat,prod)
+    Main->Main: then assign it to the variable env
+    Main->Main: use flag.Parse() which visit the command line terminal and check the input for example go run main.go env=dev like that it parsing it and assign it to the env
+    Main->Server: declare a variable app and err and call the InitializeApp function and pass the env to it
+    group InitializeApp()
+        activate Server
+        Server->Config: create a variable cfg and err and call the function LoadConfig() and pass the service name booking-service and the env to it
+        group LoadConfig()
+            activate Config
+                Config->Config: provide the root path of the env file based on the env for example if dev is passed the developer env should be get like that
+                alt if godotenv.Load() envFile
+                    alt if not exists
+                        Config->Config: if envFile is unable to load which means os.IsNotExist(err) then through "env file isnt present continuing without env file"
+                    else
+                        Config->Config: if any other error is thrown then throw like failed to load envfile like that and return it
+                    end
+                end
+                Config->Config:create a variable config and then use the struct Config{} which have Port, databaseurl,projectroot and the baseurl and define field here by calling the getEnv() function and pass the key value within it for example "PORT",DATABASE_URL,PROJECT_ROOT, and BASE_URL
+                group getEnv()
+                    alt if the value is not nil
+                        Config->Config: use Getenv() and pass the key to it and get the value of each caller if not unable to get then return empty string
+                    end
+                end
+                Config-->Server: return the config and also the nil to the caller
+            deactivate Config
+        end
+        Server -> Logger: NewLogger(LogConfig{Level, LogDir, FileName, ServiceName})
+        group NewLogger()
+            activate Logger
+                Logger -> Logger: os.MkdirAll(logDir)
+                Logger -> Logger: os.OpenFile(filePath)
+                Logger -> Logger: zap.New(core, AddCaller)
+                Logger --> Server: *Logger
+            deactivate Logger
+        end
+        Server->Server: create a variable dbService and use the &database.DBService{}
+        Server -> DB:create a variables db and err and call EstablishConnection()function and pass the cfg.DatabaseURL to it
+        group EstablishConnection()
+            activate DB
+            DB->DB: declare a variable dialector with type gorm.Dialector this variable stores which database driver should be used\nfor example sqlite or sqlserver
+            alt if strings.HasPrefix()
+                DB->DB: use strings.HasPrefix() and check whether the dbURL starts with sqlite:// example sqlite://test.db
+                DB->DB: create a variable dbPath and use strings.TrimPrefix() to remove sqlite:// from the URL\nexample sqlite://test.db becomes test.db
+                DB->DB: assign sqlite.Open(dbPath) into dialector this prepares the sqlite driver with the database file path
+            else if strings.HasPrefix()
+                DB->DB: check whether the dbURL starts with sqlserver:// example sqlserver://localhost:1433
+                DB->DB: assign sqlserver.Open(dbURL) into dialector\nthis prepares the sqlserver database driver using the provided URL
+            else
+                DB->DB: if no known prefix is matched then default to sqlserver.Open(dbURL)
+                DB->DB: assign sqlserver.Open(dbURL) into dialector this acts as the fallback database driver
+            end
+            DB->DB: create variables db and err and call gorm.Open() pass the dialector and &gorm.Config{} gorm.Open() establishes the GORM database connection
+            alt if err != nil
+                DB-->Server: return nil and err this means the database connection creation failed
+            end
+            DB->DB: create variables sqlDB and err and call db.DB() this converts the GORM database instance into native sql.DB object
+            alt if err != nil
+                DB-->Server: return nil and err this means unable to extract the native sql.DB instance
+            end
+            DB->DB: call sqlDB.Ping() Pong() checks whether the database is reachable and alive
+            alt if err := sqlDB.Ping(); err != nil
+                DB-->Server: return nil and err this means the database server is unreachable or connection failed
+            end
+            DB->DB: create and return &Db{} assign Gorm field with db assign SqlDb field with sqlDB
+            DB-->Server: return &Db{Gorm: db, SqlDb: sqlDB}, nil successful database connection object is returned
+           
+        end
+        Server->DB: create a variable err and call database.AutoMigrate() and pass the db and logger to it
+        group AutoMigrate()
+            DB->DB: create a variable err and use db.Gorm.AutoMigrate() then add models like Rooms,Customers,Bookings and Booking_rooms/ to it
+            alt if err is not nil
+                DB->Server: return err to the server shows failed to run migrations and shows internal server 500 to it
+            end
+            DB-->Server: return nil to the server caller function
+        end
+        alt if migration failed
+            DB-->Server: if unable to connect the db automigrate then through the error and return nil and err
+            deactivate DB
+            Server-->Main: throw internal server error 500
+            Main-->Client:upwards and forwards the error to the client and raise the internal server error 500
+        end
+        Server->Server: create a variable router and assign mux.NewRouter() to it to use gorrilla mux
+        Server->Router: use handlers and call the SetUpRoutes functions in the routes and pass this above router, db, logger and cfg to it
+        activate Router
+        group SetupRoutes()
+            Router->Router: create a variable bookRepo and use repostiory and initialize its NewBookRepository with passing db and logger to it
+            Router->Router: create a variable bookService and use services and injects the bookRepo and logger to the NewBookService
+            Router->Router: create a variable bookHandler and use NewBookHandler and inject the bookService and logger to it
+            Router->Router: create a variable api and setup the router path prefix as "book/api/v1"
+            Router->Router: and use api.HandleFunc() and the endpoint as bookings and use the bookHandler.BookRoom and define its method as post
+            Router->Router: then again use the same endpoint and register the other functions like GetRooms and CancelRoom to it with the GET method and PATCH method
+            deactivate Router
+        end
+        Server-->Main: assign the filed logger,router,cfg,dbservice with respective field of the Application struct and return it to the main
+        alt if recive an err
+            Main-->Client: raise standardize error and throw like failed to initialize the app then close the terminal by providing the os.Exit as 1
+        end
+        Main->Server: call the server.RunServer() and pass the app to it
+        alt if err is not nil
+            Main-->Client: raise the message like failed to start the server
+            deactivate Main
+        end
+        group GetCorsOptions()
+            Server->Server: return the cors options with allowedOrigins, allowed methods and allowedheaders to it
+        end
+        group RunServer()
+            Server->Server: create a variable corsOpts and assign the GetCorsOptions() functions to it
+            Server->Server: create a variable handler and bind the corsOpts with the Handler and app.router tell the server like first entering corsmiddleware then register routes and go to handlers
+            Server->Server: use http.ListenAndServe() and pass the port number eg: 8080 by using app.config.Port and assign the handler here
+        end
+        deactivate Server
+    end
+end
+
+== Booking room request ==
+
+Client -> Handler: POST /api/v1/bookings{name:"Kirthi","age":22,"address":"123 main street","room_id":101,"start_time":"","end_time":,purpose:"project meeting"
+activate Client
+activate Handler       
+group ReserveRoom()
+Handler -> Handler: use the function reserveRoom(w,r)
+activate Logger
+Handler -> Logger: While processing the booking request, the Handler records a log message stating that a room is being reserved.Info("Recieved request to reserve room")
+Handler -> Handler: In a ReserveRoom() create a variable req (in this i will pass BookingRequest)
+Handler -> Handler: using json.NewDecoder(r.body).Decode(&req) ( takes the data sent by the client (in JSON format), reads it from the request, and converts it into a Go struct (req) so the handler can easily use it)
+alt if JSON decode fails
+   Handler -> Logger: Error(Failed to decode request body)
+   Handler -> Utils: WriteResponse(w, 400, APIResponse{Status: "Error",Code: 400, Message: "Failed to decode the request",Errors: validationErrors, Timestamp: current time})
+   activate Utils
+    group WriteResponse()
+                alt if the content type is empty
+                    Utils->Utils: in w.header() get the content type and check it is empty if it is empty
+                    Utils->Utils: then set the content type as application/json
+                end
+                Utils->Utils: pass the status code to w.WriteHeader()
+                alt if error in encoding  
+                    Utils-->Client: raise the internal server error and forwards it to the client
+                    note over Client
+                    {
+                        code:500,
+                        status:"error",
+                        message:"Internal server error",
+                        data:None,
+                        error:{"type": "HandlerException", "details": str(e)},
+                        request_id:request_id,
+                        timestamp: timestamp,
+                    }
+                    end note
+                end
+            end
+            Utils --> Client: upward and raise the error to the client
+            note over Client
+            {
+                code:400,
+                status:"error",
+                message:"Invalid request format",
+                data:None,
+                error:{"type": "HandlerException", "details": str(e)},
+                request_id:request_id,
+                timestamp: timestamp,
+            }
+            end note
+        end
+        Handler -> Utils: then use ValidateStruct() and pass the request body &req to it to verify it has the valid required field format or not according to the RoomBookRequest dtos
+           
+                Utils -> Utils: validate.Struct(s) using go-playground/validator
+                Utils --> Handler: []Error (empty if valid)
+           
+        alt if validation errors exist
+            Handler -> Utils:  Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Validation failed"})
+            Utils --> Client: raise and forward the error to the client
+            note over Client
+            {
+                "code":400,
+                "status":"error",
+                "message":"Invalid request format",
+                "data":None,
+                "error":{"type": "HandlerException", "details": str(e)},
+                "request_id":request_id,
+                "timestamp": timestamp,
+            }
+            end note
+        end
+Handler -> Service : The handler calls ReserveRoom() in the service layer, passing the request data and context, to process the Booking creation (booking) logic and generate a response.
+activate Service
+Service -> Logger: While processing the booking request, the Service records a log message stating that a room is being reserved.Info("Recieved request to reserve room")
+Service -> Service: Defines the ReserveRoom() function in the service, which takes context and booking request as input and returns an API response.
+Service  -> Service: The service checks whether the end date comes after the start date before proceeding with the booking.
+ alt if req.StartTime is after req.EndTime
+            Service -> Handler: Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Validation failed"})
+            Handler -> Utils: Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Validation failed"})
+            Utils --> Client: raise and forward the error to the client
+            note over Client
+            {
+                "code":400,
+                "status":"error",
+                "message":"Invalid request format",
+                "data":None,
+                "error":{"type": "HandlerException", "details": str(e)},
+                "request_id":request_id,
+                "timestamp": timestamp,
+            }
+            end note
+        end
+group GetRoomsByIDs
+
+Service -> Repo: GetRoomsByIDs(ctx, req.RoomIDs)
+activate Repo
+Repo -> Repo: Validate input room IDs
+Repo -> DB: Query rooms table using provided RoomIDs
+note over DB
+r.db.Gorm.WithContext(ctx).
+Where("id IN ? AND is_active = ?", roomIDs, true).
+First(&rooms).Error
+end note
+
+alt if database error occurs
+    Repo -> Logger: Log error "GetRoomsByIDs failed" with error details
+    Repo -> Service: Return (nil, dtoErr{Code:"INTERNAL_ERROR", Message:"database error"})
+else if one or more rooms not found
+    Repo -> Logger: Log warning "rooms not found for given IDs"
+    Repo -> Service: Return (nil, dtoErr{Code:"NOT_FOUND", Message:"rooms not found"})
+else success
+    Repo --> Service: Return (rooms, nil)
+end
+
+alt if dtoErr != nil
+    Service -> Logger: Log error "ReserveRoom: room lookup failed" with dtoErr.Message
+    
+    alt if dtoErr.Code == "NOT_FOUND"
+        Service -> Handler: CreateErrorResponse(404, "one or more rooms not found", dtoErr)
+        Handler -> Utils: WriteResponse(w, 404, APIResponse{Status:"Error", Message:"one or more rooms not found"})
+        Utils -> Client: Send HTTP 404 response
+        note over Client
+        {
+            "code": 404,
+            "status": "error",
+            "message": "one or more rooms not found",
+            "data": null,
+            "errors": [
+                {
+                    "message": dtoErr.Message,
+                    "code": "NOT_FOUND"
+                }
+            ]
+        }
+        end note
+    else
+        Service -> Handler: CreateErrorResponse(500, "one or more rooms not found", dtoErr)
+        Handler -> Utils: WriteResponse(w, 500, APIResponse{Status:"Error", Message:"one or more rooms not found"})
+        Utils -> Client: Send HTTP 500 response
+        note over Client
+        {
+            "code": 500,
+            "status": "error",
+            "message": "one or more rooms not found",
+            "data": null,
+            "errors": [
+                {
+                    "message": dtoErr.Message,
+                    "code": "INTERNAL_ERROR"
+                }
+            ]
+        }
+        end note
+    end
+end
+end
+group CheckRoomAvailability
+Service -> Repo:The service calls CheckRoomAvailability(ctx, req.RoomID, req.StartDate, req.EndDate), where ctx is used to control request lifecycle, req.RoomID identifies the room, req.StartDate and req.EndDate define the booking period, and it receives available (a boolean indicating if the room is free) along with dtoErr (error details if any issue occurs).
+Repo -> Repo: A variable `count` is initialized to store the number of booking records that match the query conditions (overlapping bookings)
+Repo-> DB : Executes a GORM query on booking_rooms joined with bookings to count active bookings for the given room_id where the requested date range overlaps (existing start_date < new end_date and existing end_date > new start_date) to determine room availability.
+note over DB
+db.Gorm.WithContext(ctx).
+Model(&models.Booking{}). 
+Where("room_id = ? AND is_active = ? AND start_date < ? AND end_date > ?",roomID, true, endDate, startDate). 
+ Count(&count).Error
+end note
+  
+alt if database error occurs
+    Repo -> Logger: Logs error "CheckRoomAvailability failed" with roomID and error details
+    Repo -> Service : Sends back a failed response (false) with error details (message and error code), indicating that the room availability check encountered a database error and could not be processed successfully.
+else 
+Repo--> Service: Return (true if count == 0, false otherwise) indicating room availability status
+end
+alt if availability check returns error (dtoErr != nil)
+    Service -> Logger: Log error "ReserveRoom: availability check failed" with roomID and error message
+    Service -> Handler: Refer CreateErrorResponse(500, "failed to check room availability", APIResponse{Status:"Error", Message:"failed to check room availability", Error: dtoErr})
+    Handler -> Utils:  Refer (62) WriteResponse(w, 500, APIResponse{Status:"Error", Message:"Validation failed"})
+    Utils -> Client: Forward HTTP 500 error response to the client
+    note over Client
+    {
+        "code": 500,
+        "status": "error",
+        "message": "failed to check room availability",
+        "data": null,
+        "errors": [
+            {
+                "field": "room_id",
+                "message": dtoErr.Message,
+                "code": "INTERNAL_ERROR"
+            }
+        ]
+    }
+    end note
+end
+alt if room is not available (!available)
+
+    Service -> Handler: Refer CreateErrorResponse(409, "rooms are already booked for the requested period", APIResponse{Status:"Error", Message:"one or more rooms are already booked for the requested period", Error: conflict details})
+    Handler -> Utils:  Refer (62) WriteResponse(w, 409, APIResponse{Status:"Error", Message:"one or more rooms are already booked for the requested period"})
+    Utils -> Client: Forward HTTP 409 error response to the client
+    note over Client
+    {
+        "code": 409,
+        "status": "error",
+        "message": " rooms are already booked for the requested period",
+        "data": null,
+        "errors": [
+            {
+                "field": "room_ids",
+                "message": "room already booked",
+                "code": "CONFLICT"
+            }
+        ]
+    }
+    end note
+end
+group CreateOrGetCustomer()
+Service -> Repo: Calls CreateOrGetCustomer() to create or fetch customer details, and checks if any error (dtoErr) is returned
+Repo -> Repo: Defines the CreateOrGetCustomer(ctx, customer) method in the repository to handle creating or retrieving customer data and return any error if the operation fails
+Repo -> Repo: Initializes an empty customer object to hold customer data fetched from the database when querying by phone number to determine if the customer already exists.
+Repo -> DB : Executes a query to find an active customer whose phone number matches the provided value and stores the result in the customer variable; returns any error encountered during the lookup.
+note over DB
+db.Gorm.WithContext(ctx).
+Where("phone_number = ? AND is_active = ?", req.PhoneNumber, true).
+First(&customer).Error
+end note
+Repo -> Service : Returns the retrieved customer data when the database query succeeds (no error), indicating that an existing active customer was found for the given phone number.
+Repo -> Repo: Detects that no existing customer record was found for the given phone number, and proceeds to create a new customer record using the request data.
+Repo-> DB : Inserts a new customer record into the database with the provided details (name, age, address, phone number) and system metadata fields.
+note over DB
+db.Gorm.WithContext(ctx).Create(&customer).Error
+end note
+alt if create customer query fails (err != nil)
+    Repo -> Logger: Log error "CreateCustomer failed" with error details
+    Repo --> Service: Return (nil, error details) indicating customer creation failure
+else 
+    Repo--> Service: Return created customer data
+end
+alt if unexpected database error occurs during CreateOrGetCustomer (err != nil)
+    Repo -> Logger: Log error "CreateOrGetCustomer failed" with error details
+end
+alt if CreateOrGetCustomer returns error (dtoErr != nil)
+    Service -> Logger: Log error "ReserveRoom: CreateOrGetCustomer failed" with phone number and error message
+    Service -> Handler: Create error response (500, "failed to process customer", error details)
+    Handler -> Utils:  Refer (62) WriteResponse(w, 500, APIResponse{Status:"Error", Message:"failed to process customer"})
+    Utils -> Client: Forward HTTP 500 error response to the client
+    note over Client
+    {
+        "code": 500,
+        "status": "error",
+        "message": "failed to process customer",
+        "data": null,
+        "errors": [
+            {
+                "field": "customer",
+                "message": dtoErr.Message,
+                "code": "INTERNAL_ERROR"
+            }
+        ]0
+    }
+    end note
+end
+end
+group CreateBooking()
+Service -> Repo: Calls CreateBooking(ctx, bookingRooms) to create a new booking record
+Repo -> Repo: Defines CreateBookingRooms method in repository using injected DB and Logger
+Repo -> Repo: Receives ctx (used for request lifecycle management) and bookingRooms to contaim a booking details
+Repo -> DB: Executes GORM insert query to store booking record
+note over DB
+db.Gorm.WithContext(ctx).Create(booking).Error
+end note
+alt if booking_room fails (err != nil)
+    Repo -> Logger: Log error "CreateBooking failed" with roomID and error details
+    Repo --> Service: Return error details indicating failure to insert booking_room record
+else 
+Repo --> Service: Return nil indicating successful booking
+end
+deactivate Repo
+alt if CreateBookingWithRooms fails (dtoErr != nil)
+    Service -> Logger: Log error "ReserveRoom: CreateBookingWithRooms failed" with error message
+    Service -> Handler: Create error response (500, "failed to create booking", error details)
+    Handler -> Utils:  Refer (62) WriteResponse(w, 500, APIResponse{Status:"Error", Message:"Bad request"})
+    Utils -> Client: Forward HTTP 500 error response to the client
+    note over Client
+     {
+  "code": 500,
+  "status": "error",
+  "message": "Internal server error booking room is failed",
+  "data": null,
+  "error": {
+    "type": "HandlerException",
+    "details": "Exception details here"
+  },
+  "request_id": "your-request-id",
+  "timestamp": "2026-05-25T14:59:27Z"
+}
+
+    end note
+   else (booking created successfully)
+    Service -> Service: Declare a variable hours to subract check in from check out to get a duartion , converts it to a float64 number of hours
+    Service -> Service: Declare a varibale day , divide hours by 24 to get days, ceil rounds up so 1.5 days become 2 days - the customer is charged for the full day
+    Service -> Service : Declare a variable Total price and set the price to zero before the loop starts
+    Service -> Service : add room price multiplied by number of days to get the total cost
+    Service -> Logger: Log info "Room(s) reserved successfully" with booking UUID, room IDs, and customer ID
+    Service -> Handler: Create success response (201, "Room(s) reserved successfully", booking details)
+   Handler -> Utils:  Refer (62) WriteResponse(w, 200, APIResponse{Status:"Error", Message:"Booking created successfully"})
+    Utils -> Client: Forward HTTP 201 success response to the client
+
+    note over Client
+    {
+  "status": "Success",
+  "code": 201,
+  "message": "room booked successfully",
+  "data": {
+    "booking_id": "101",
+    "room_ids": 1,
+    "booking_status": "booked",
+    "price": 5000
+  }
+  "request_id" : "ncbdcnagcoahciuaiec97"
+  "timestamp": "2026-05-08T10:11:13Z",
+ }
+    end note
+end
+end 
+deactivate Handler
+end
+deactivate Client
+end
+ @enduml

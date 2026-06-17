@@ -1,0 +1,1028 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>config: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">room_booking_management/room_booking_service/internal/config/config.go (91.7%)</option>
+				
+				<option value="file1">room_booking_management/room_booking_service/internal/dtos/response_dto.go (0.0%)</option>
+				
+				<option value="file2">room_booking_management/room_booking_service/internal/handlers/booking_handler.go (100.0%)</option>
+				
+				<option value="file3">room_booking_management/room_booking_service/internal/handlers/routes.go (100.0%)</option>
+				
+				<option value="file4">room_booking_management/room_booking_service/internal/loggers/logger.go (68.2%)</option>
+				
+				<option value="file5">room_booking_management/room_booking_service/internal/models/booking.go (100.0%)</option>
+				
+				<option value="file6">room_booking_management/room_booking_service/internal/repository/booking_repository.go (100.0%)</option>
+				
+				<option value="file7">room_booking_management/room_booking_service/internal/services/booking_service.go (98.5%)</option>
+				
+				<option value="file8">room_booking_management/room_booking_service/internal/utils/utils.go (100.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">package config
+
+import (
+        "fmt"
+        "os"
+
+        "github.com/joho/godotenv"
+)
+
+type Config struct {
+        Port        string
+        DatabaseURL string
+        ProjectRoot string
+        BaseUrl     string
+        LogLevel    string
+        LogDir      string
+        LogFileName string
+}
+
+func LoadConfig(serviceName, env string) (*Config, error) <span class="cov8" title="1">{
+        envFile := fmt.Sprintf("envs/.env.%s", env) 
+
+        if err := godotenv.Load(envFile); err != nil </span><span class="cov8" title="1">{
+                if os.IsNotExist(err) </span><span class="cov8" title="1">{
+                        fmt.Println("ENV file isn't present, continuing without it:", envFile)
+                }</span> else<span class="cov0" title="0"> {
+                        return nil, fmt.Errorf("failed to load %s: %w", envFile, err)
+                }</span>
+        }
+
+        <span class="cov8" title="1">config := &amp;Config{
+                Port:        getEnv("PORT", ""),
+                DatabaseURL: getEnv("DATABASE_URL", ""),
+                ProjectRoot: getEnv("PROJECT_ROOT", ""),
+                BaseUrl:     getEnv("BASE_URL", ""),
+                LogLevel:    getEnv("BASE_URL","info"),
+            LogDir:      getEnv("Log_Dir","./logs"),
+            LogFileName: getEnv("Log_File_Name","room-booking.log"),
+        }
+
+        if config.DatabaseURL == "" </span><span class="cov8" title="1">{
+                return nil, fmt.Errorf("DATABASE_URL environment variable is required")
+        }</span>
+
+        <span class="cov8" title="1">return config, nil</span>
+}
+
+func getEnv(key, defaultValue string) string <span class="cov8" title="1">{
+        if value := os.Getenv(key); value != "" </span><span class="cov8" title="1">{
+                return value
+        }</span>
+        <span class="cov8" title="1">return defaultValue</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">package dtos
+
+import "room_booking_management/room_booking_service/internal/errorcodes"
+
+type APIResponse struct {
+        Status    string      `json:"status"`          
+        Code      int         `json:"code"`             
+        Message   string      `json:"message"`          
+        Data      interface{} `json:"data,omitempty"`   
+        Errors    []Error     `json:"errors,omitempty"` 
+        Meta      *Meta       `json:"meta,omitempty"`   
+        RequestID string      `json:"request_id"`       
+        Timestamp string      `json:"timestamp"`       
+}
+
+type Error struct {
+        Field   string `json:"field,omitempty"` 
+        Message string `json:"message"`         
+        Code    string `json:"code"`            
+}
+
+func (e *Error) Error() string <span class="cov0" title="0">{
+        return e.Message
+}</span>
+
+type Meta struct {
+        Page     int `json:"page"`      
+        PageSize int `json:"page_size"` 
+        Total    int64 `json:"total"`    
+}
+
+type ValidationError struct {
+        Field   string
+        Message string
+}
+
+func (e *ValidationError) Error() string <span class="cov0" title="0">{
+        return e.Message
+}</span>
+
+func ValidationErrorToAPIError(err *ValidationError) Error <span class="cov0" title="0">{
+        return Error{
+                Field:   err.Field,
+                Message: err.Message,
+                Code:    string(errorcodes.ErrCodeValidation),
+        }
+}</pre>
+		
+		<pre class="file" id="file2" style="display: none">package handlers
+
+import (
+        "context"
+        "encoding/json"
+        "net/http"
+
+        "room_booking_management/room_booking_service/internal/dtos"
+        "room_booking_management/room_booking_service/internal/loggers"
+        "room_booking_management/room_booking_service/internal/services"
+        "room_booking_management/room_booking_service/internal/utils"
+
+        "github.com/gorilla/mux"
+        "go.uber.org/zap"
+)
+
+
+type ReservationHandlerInterface interface {
+        ReserveRoom(w http.ResponseWriter, r *http.Request)
+        CancelBooking(w http.ResponseWriter, r *http.Request)
+        GetRooms(w http.ResponseWriter, r *http.Request)
+}
+
+
+type ReservationHandler struct {
+        reservationService services.ReservationServiceInterface
+        logger             *loggers.Logger
+}
+
+func NewReservationHandler(reservationService services.ReservationServiceInterface,logger *loggers.Logger,) ReservationHandlerInterface <span class="cov8" title="1">{
+        return &amp;ReservationHandler{
+                reservationService: reservationService,
+                logger:             logger,
+        }
+}</span>
+
+
+func (h *ReservationHandler) ReserveRoom(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        reqID := utils.GetOrGenerateRequestID(r)
+        ctx := context.WithValue(r.Context(), "requestID", reqID)
+
+        var req dtos.CreateBookingRequest
+        if err := json.NewDecoder(r.Body).Decode(&amp;req); err != nil </span><span class="cov8" title="1">{
+                h.logger.Warn("ReserveRoom: invalid request body", zap.Error(err))
+                resp := utils.NewErrorResponse(http.StatusBadRequest, "invalid request body", []dtos.Error{
+                        {Field: "body", Message: err.Error(), Code: "BAD_REQUEST_400"},
+                }, reqID)
+                utils.WriteResponse(w, http.StatusBadRequest, resp)
+                return
+        }</span>
+
+        <span class="cov8" title="1">if errs := utils.ValidateStruct(req); len(errs) &gt; 0 </span><span class="cov8" title="1">{
+                resp := utils.NewErrorResponse(http.StatusBadRequest, "validation failed", errs, reqID)
+                utils.WriteResponse(w, http.StatusBadRequest, resp)
+                return
+        }</span>
+
+        <span class="cov8" title="1">resp := h.reservationService.ReserveRoom(ctx, req)
+        utils.WriteResponse(w, resp.Code, resp)</span>
+}
+
+
+func (h *ReservationHandler) CancelBooking(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        reqID := utils.GetOrGenerateRequestID(r)
+        ctx := context.WithValue(r.Context(), "requestID", reqID)
+
+        vars := mux.Vars(r)
+        bookingID := vars["bookingID"]
+        if bookingID == "" </span><span class="cov8" title="1">{
+                resp := utils.NewErrorResponse(http.StatusBadRequest, "booking_id is required", []dtos.Error{
+                        {Field: "bookingID", Message: "missing in path", Code: "BAD_REQUEST_400"},
+                }, reqID)
+                utils.WriteResponse(w, http.StatusBadRequest, resp)
+                return
+        }</span>
+
+        <span class="cov8" title="1">resp := h.reservationService.CancelBooking(ctx, bookingID)
+        utils.WriteResponse(w, resp.Code, resp)</span>
+}
+
+func (h *ReservationHandler) GetRooms(w http.ResponseWriter, r *http.Request) <span class="cov8" title="1">{
+        reqID := utils.GetOrGenerateRequestID(r)
+        ctx := context.WithValue(r.Context(), "requestID", reqID)
+
+        vars := mux.Vars(r)
+        bookingID := vars["bookingID"]
+
+        if bookingID != "" </span><span class="cov8" title="1">{
+                resp := h.reservationService.GetRoomByBookingID(ctx, bookingID)
+                utils.WriteResponse(w, resp.Code, resp)
+                return
+        }</span>
+
+        <span class="cov8" title="1">resp := h.reservationService.GetRooms(ctx)
+        utils.WriteResponse(w, resp.Code, resp)</span>
+}</pre>
+		
+		<pre class="file" id="file3" style="display: none">package handlers
+
+import (
+        "net/http"
+
+        "room_booking_management/room_booking_service/internal/config"
+        "room_booking_management/room_booking_service/internal/loggers"
+        "room_booking_management/room_booking_service/internal/repository"
+        "room_booking_management/room_booking_service/internal/services"
+        "room_booking_management/room_booking_service/pkg/database"
+
+        "github.com/gorilla/mux"
+)
+
+func SetupRoutes(router *mux.Router, db *database.Db, logger *loggers.Logger, cfg *config.Config) <span class="cov8" title="1">{
+
+        reservationRepo := repository.NewReservationRepository(db, logger)
+
+        reservationService := services.NewReservationService(reservationRepo, logger)
+
+        reservationHandler := NewReservationHandler(reservationService, logger)
+
+        api := router.PathPrefix("/api/v1").Subrouter()
+
+        
+        api.HandleFunc("/reservations", reservationHandler.ReserveRoom).Methods(http.MethodPost)
+        api.HandleFunc("/reservations/{bookingID}/cancel", reservationHandler.CancelBooking).Methods(http.MethodPut)
+        api.HandleFunc("/rooms", reservationHandler.GetRooms).Methods(http.MethodGet)
+        api.HandleFunc("/rooms/{bookingID}", reservationHandler.GetRooms).Methods(http.MethodGet)
+}</pre>
+		
+		<pre class="file" id="file4" style="display: none">package loggers
+
+import (
+        "fmt"
+        "os"
+        "path/filepath"
+
+        "go.uber.org/zap"
+        "go.uber.org/zap/zapcore"
+)
+
+type Logger struct {
+        zap *zap.Logger
+}
+
+type LogConfig struct {
+        Level       string
+        LogDir      string
+        FileName    string
+        ServiceName string
+}
+
+
+func NewLogger(cfg LogConfig) *Logger <span class="cov8" title="1">{
+        if err := os.MkdirAll(cfg.LogDir, 0755); err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("failed to create log directory %s: %v", cfg.LogDir, err))</span>
+        }
+
+        <span class="cov8" title="1">filePath := filepath.Join(cfg.LogDir, cfg.FileName)
+        file, err := os.OpenFile(filePath, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+        if err != nil </span><span class="cov0" title="0">{
+                panic(fmt.Sprintf("failed to open log file %s: %v", filePath, err))</span>
+        }
+
+        <span class="cov8" title="1">encoderCfg := zapcore.EncoderConfig{
+                TimeKey:      "timestamp",
+                LevelKey:     "level",
+                NameKey:      "service",
+                MessageKey:   "message",
+                CallerKey:    "caller",
+                EncodeLevel:  zapcore.LowercaseLevelEncoder,
+                EncodeTime:   zapcore.ISO8601TimeEncoder,
+                EncodeCaller: zapcore.ShortCallerEncoder,
+        }
+
+        level := parseLevel(cfg.Level)
+        jsonEncoder := zapcore.NewJSONEncoder(encoderCfg)
+
+        core := zapcore.NewTee(
+                zapcore.NewCore(jsonEncoder, zapcore.AddSync(os.Stdout), level),
+                zapcore.NewCore(jsonEncoder, zapcore.AddSync(file), level),
+        )
+
+        return &amp;Logger{zap: zap.New(core, zap.AddCaller(), zap.AddCallerSkip(1)).Named(cfg.ServiceName)}</span>
+}
+
+func (l *Logger) Info(msg string, fields ...zap.Field) <span class="cov8" title="1">{
+        l.zap.Info(msg, fields...)
+
+}</span>
+func (l *Logger) Error(msg string, fields ...zap.Field) <span class="cov8" title="1">{
+
+        l.zap.Error(msg, fields...)
+
+}</span>
+func (l *Logger) Warn(msg string, fields ...zap.Field) <span class="cov8" title="1">{
+
+        l.zap.Warn(msg, fields...)
+
+}</span>
+func (l *Logger) Fatal(msg string, fields ...zap.Field) <span class="cov0" title="0">{
+
+        l.zap.Fatal(msg, fields...)
+}</span>
+func (l *Logger) Sync() <span class="cov8" title="1">{
+        _ = l.zap.Sync()
+}</span>
+
+func parseLevel(level string) zapcore.Level <span class="cov8" title="1">{
+        switch level </span>{
+        case "debug":<span class="cov0" title="0">
+                return zapcore.DebugLevel</span>
+        case "info":<span class="cov0" title="0">
+                return zapcore.InfoLevel</span>
+        case "warn":<span class="cov0" title="0">
+                return zapcore.WarnLevel</span>
+        case "error":<span class="cov0" title="0">
+                return zapcore.ErrorLevel</span>
+        default:<span class="cov8" title="1">
+                return zapcore.InfoLevel</span>
+        }
+}
+</pre>
+		
+		<pre class="file" id="file5" style="display: none">package models
+ 
+import (
+        "time"
+)
+ 
+ 
+type Customer struct {
+        ID          uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+        UUID        string    `gorm:"type:uuid;uniqueIndex;not null" json:"uuid"`
+        Name        string    `gorm:"type:varchar(150);not null" json:"name"`
+        Age         int       `gorm:"not null" json:"age"`
+        Address     string    `gorm:"type:text" json:"address"`
+        PhoneNumber string    `gorm:"type:varchar(20);not null" json:"phone_number"`
+        CreatedAt   time.Time `json:"created_at"`
+        UpdatedAt   time.Time `json:"updated_at"`
+        CreatedBy   string    `gorm:"type:varchar(100)" json:"created_by"`
+        UpdatedBy   string    `gorm:"type:varchar(100)" json:"updated_by"`
+        IsActive    bool      `gorm:"default:true" json:"is_active"`
+}
+ 
+func (Customer) TableName() string <span class="cov8" title="1">{
+        return "customers"
+}</span>
+ 
+ 
+type Room struct {
+        ID        uint      `gorm:"primaryKey;autoIncrement" json:"id"`
+        UUID      string    `gorm:"type:uuid;uniqueIndex;not null" json:"uuid"`
+        Price     float64   `gorm:"type:decimal(10,2);not null" json:"price"`
+        RoomType  string    `gorm:"type:varchar(100);not null" json:"room_type"`
+        Capacity  int       `gorm:"not null" json:"capacity"`
+        RoomFloor int       `gorm:"not null" json:"room_floor"`
+        RoomName  string    `gorm:"type:varchar(100);not null" json:"room_name"`
+        CreatedAt time.Time `json:"created_at"`
+        UpdatedAt time.Time `json:"updated_at"`
+        CreatedBy string    `gorm:"type:varchar(100)" json:"created_by"`
+        UpdatedBy string    `gorm:"type:varchar(100)" json:"updated_by"`
+        IsActive  bool      `gorm:"default:true" json:"is_active"`
+}
+ 
+func (Room) TableName() string <span class="cov8" title="1">{
+        return "rooms"
+}</span>
+ 
+ 
+type Booking struct {
+    ID         uint
+    UUID       string
+    CustomerID int
+    RoomID     uint
+    StartDate  time.Time
+    EndDate    time.Time
+    Purpose    string
+        TotalPrice float64
+    CreatedAt  time.Time
+    UpdatedAt  time.Time
+    CreatedBy  string
+    UpdatedBy  string
+    IsActive   bool
+    Room       *Room     `gorm:"foreignKey:RoomID" json:"room,omitempty"`
+}
+
+ 
+func (Booking) TableName() string <span class="cov8" title="1">{
+        return "bookings"
+}</span>
+ </pre>
+		
+		<pre class="file" id="file6" style="display: none">package repository
+
+import (
+        "context"
+        "errors"
+        "fmt"
+
+        "room_booking_management/room_booking_service/internal/loggers"
+        "room_booking_management/room_booking_service/pkg/database"
+        "room_booking_management/room_booking_service/internal/dtos"
+        "room_booking_management/room_booking_service/internal/models"
+
+        "go.uber.org/zap"
+        "gorm.io/gorm"
+)
+
+
+type ReservationRepositoryInterface interface {
+        GetCustomerByPhone(ctx context.Context, phone string) (*models.Customer, *dtos.Error)
+        CreateCustomer(ctx context.Context, customer *models.Customer) *dtos.Error
+        GetRoomByID(ctx context.Context, roomID uint) (*models.Room, *dtos.Error)
+        CheckRoomAvailability(ctx context.Context, roomID uint, startDate, endDate interface{}) (bool, *dtos.Error)
+        CreateBooking(ctx context.Context, booking *models.Booking) *dtos.Error
+        CancelBooking(ctx context.Context, bookingID string) *dtos.Error
+        GetRooms(ctx context.Context) ([]models.Room, int64, *dtos.Error)
+        GetRoomByBookingID(ctx context.Context, bookingID string) (*models.Booking, *dtos.Error)
+}
+
+
+type ReservationRepository struct {
+        db     *database.Db
+        logger *loggers.Logger
+}
+
+func NewReservationRepository(db *database.Db, logger *loggers.Logger) ReservationRepositoryInterface <span class="cov8" title="1">{
+        return &amp;ReservationRepository{db: db, logger: logger}
+}</span>
+
+
+func (r *ReservationRepository) GetCustomerByPhone(ctx context.Context, phone string) (*models.Customer, *dtos.Error) <span class="cov8" title="1">{
+        var customer models.Customer
+        err := r.db.Gorm.WithContext(ctx).
+                Where("phone_number = ? AND is_active = ?", phone, true).
+                First(&amp;customer).Error
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov8" title="1">{
+                        return nil, nil
+                }</span>
+                <span class="cov8" title="1">r.logger.Error("GetCustomerByPhone failed", zap.String("phone", phone), zap.Error(err))
+                return nil, &amp;dtos.Error{Field: "phone_number", Message: err.Error(), Code: "INTERNAL_ERROR_500"}</span>
+        }
+
+        <span class="cov8" title="1">return &amp;customer, nil</span>
+}
+
+func (r *ReservationRepository) CreateCustomer(ctx context.Context, customer *models.Customer) *dtos.Error <span class="cov8" title="1">{
+        if result := r.db.Gorm.WithContext(ctx).Create(customer); result.Error != nil </span><span class="cov8" title="1">{
+                r.logger.Error("CreateCustomer failed", zap.Error(result.Error))
+                return &amp;dtos.Error{Field: "customer", Message: result.Error.Error(), Code: "INTERNAL_ERROR_500"}
+        }</span>
+        <span class="cov8" title="1">return nil</span>
+}
+func (r *ReservationRepository) GetRoomByID(ctx context.Context, roomID uint) (*models.Room, *dtos.Error) <span class="cov8" title="1">{
+        var room models.Room
+        err := r.db.Gorm.WithContext(ctx).
+                Where("id = ? AND is_active = ?", roomID, true).
+                First(&amp;room).Error
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov8" title="1">{
+                        return nil, &amp;dtos.Error{
+                                Field:   "room_id",
+                                Message: fmt.Sprintf("room %d not found or inactive", roomID),
+                                Code:    "NOT_FOUND",
+                        }
+                }</span>
+                <span class="cov8" title="1">r.logger.Error("GetRoomByID failed", zap.Uint("roomID", roomID), zap.Error(err))
+                return nil, &amp;dtos.Error{Field: "room_id", Message: err.Error(), Code: "INTERNAL_ERROR_500"}</span>
+        }
+
+        <span class="cov8" title="1">return &amp;room, nil</span>
+}
+
+
+func (r *ReservationRepository) CheckRoomAvailability(ctx context.Context, roomID uint, startDate, endDate interface{}) (bool, *dtos.Error) <span class="cov8" title="1">{
+        var count int64
+        err := r.db.Gorm.WithContext(ctx).
+                Model(&amp;models.Booking{}).
+                Where(
+                        "room_id = ? AND is_active = ? AND start_date &lt; ? AND end_date &gt; ?",
+                        roomID, true, endDate, startDate,
+                ).
+                Count(&amp;count).Error
+
+        if err != nil </span><span class="cov8" title="1">{
+                r.logger.Error("CheckRoomAvailability failed", zap.Uint("roomID", roomID), zap.Error(err))
+                return false, &amp;dtos.Error{Field: "room_id", Message: err.Error(), Code: "INTERNAL_ERROR_500"}
+        }</span>
+
+        <span class="cov8" title="1">return count == 0, nil</span>
+}
+
+func (r *ReservationRepository) CreateBooking(ctx context.Context, booking *models.Booking) *dtos.Error <span class="cov8" title="1">{
+        if result := r.db.Gorm.WithContext(ctx).Create(booking); result.Error != nil </span><span class="cov8" title="1">{
+                r.logger.Error("CreateBooking failed", zap.Error(result.Error))
+                return &amp;dtos.Error{Field: "booking", Message: result.Error.Error(), Code: "INTERNAL_ERROR_500"}
+                
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+
+func (r *ReservationRepository) CancelBooking(ctx context.Context, bookingID string) *dtos.Error <span class="cov8" title="1">{
+        var booking models.Booking
+        err := r.db.Gorm.WithContext(ctx).
+                Where("uuid = ? AND is_active = ?", bookingID, true).
+                First(&amp;booking).Error
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov8" title="1">{
+                        return &amp;dtos.Error{
+                                Field:   "booking_id",
+                                Message: fmt.Sprintf("booking %s not found or already cancelled", bookingID),
+                                Code:    "NOT_FOUND",
+                        }
+                }</span>
+                <span class="cov8" title="1">r.logger.Error("CancelBooking lookup failed", zap.String("bookingID", bookingID), zap.Error(err))
+                return &amp;dtos.Error{Field: "booking_id", Message: err.Error(), Code: "INTERNAL_ERROR_500"}</span>
+        }
+
+        <span class="cov8" title="1">if err := r.db.Gorm.WithContext(ctx).Model(&amp;booking).Update("is_active", false).Error; err != nil </span><span class="cov8" title="1">{
+                r.logger.Error("CancelBooking update failed", zap.String("bookingID", bookingID), zap.Error(err))
+                return &amp;dtos.Error{Field: "booking_id", Message: err.Error(), Code: "INTERNAL_ERROR_500"}
+        }</span>
+
+        <span class="cov8" title="1">return nil</span>
+}
+
+func (r *ReservationRepository) GetRooms(ctx context.Context) ([]models.Room, int64, *dtos.Error) <span class="cov8" title="1">{
+        var rooms []models.Room
+        var total int64
+
+        if err := r.db.Gorm.WithContext(ctx).Model(&amp;models.Room{}).Where("is_active = ?", true).Count(&amp;total).Error; err != nil </span><span class="cov8" title="1">{
+                r.logger.Error("GetRooms count failed", zap.Error(err))
+                return nil, 0, &amp;dtos.Error{Message: err.Error(), Code: "INTERNAL_ERROR_500"}
+        }</span>
+
+        <span class="cov8" title="1">if err := r.db.Gorm.WithContext(ctx).Where("is_active = ?", true).Find(&amp;rooms).Error; err != nil </span><span class="cov8" title="1">{
+                r.logger.Error("GetRooms query failed", zap.Error(err))
+                return nil, 0, &amp;dtos.Error{Message: err.Error(), Code: "INTERNAL_ERROR_500"}
+        }</span>
+
+        <span class="cov8" title="1">return rooms, total, nil</span>
+}
+
+func (r *ReservationRepository) GetRoomByBookingID(ctx context.Context, bookingID string) (*models.Booking, *dtos.Error) <span class="cov8" title="1">{
+        var booking models.Booking
+        err := r.db.Gorm.WithContext(ctx).
+                Preload("Room").
+                Where("uuid = ? AND is_active = ?", bookingID, true).
+                First(&amp;booking).Error
+
+        if err != nil </span><span class="cov8" title="1">{
+                if errors.Is(err, gorm.ErrRecordNotFound) </span><span class="cov8" title="1">{
+                        return nil, &amp;dtos.Error{
+                                Field:   "booking_id",
+                                Message: fmt.Sprintf("booking %s not found", bookingID),
+                                Code:    "NOT_FOUND",
+                        }
+                }</span>
+                <span class="cov8" title="1">r.logger.Error("GetRoomByBookingID failed", zap.String("bookingID", bookingID), zap.Error(err))
+                return nil, &amp;dtos.Error{Field: "booking_id", Message: err.Error(), Code: "INTERNAL_ERROR_500"}</span>
+        }
+
+        <span class="cov8" title="1">return &amp;booking, nil</span>
+}</pre>
+		
+		<pre class="file" id="file7" style="display: none">package services
+
+import (
+        "context"
+        "net/http"
+
+        "room_booking_management/room_booking_service/internal/dtos"
+        "room_booking_management/room_booking_service/internal/loggers"
+        "room_booking_management/room_booking_service/internal/models"
+        "room_booking_management/room_booking_service/internal/repository"
+        "room_booking_management/room_booking_service/internal/utils"
+
+        "github.com/google/uuid"
+        "go.uber.org/zap"
+)
+
+
+type ReservationServiceInterface interface {
+        ReserveRoom(ctx context.Context, req dtos.CreateBookingRequest) *dtos.APIResponse
+        CancelBooking(ctx context.Context, bookingID string) *dtos.APIResponse
+        GetRooms(ctx context.Context) *dtos.APIResponse
+        GetRoomByBookingID(ctx context.Context, bookingID string) *dtos.APIResponse
+}
+
+
+type ReservationService struct {
+        reservationRepo repository.ReservationRepositoryInterface
+        logger          *loggers.Logger
+}
+
+func NewReservationService(
+        reservationRepo repository.ReservationRepositoryInterface,
+        logger *loggers.Logger,
+) ReservationServiceInterface <span class="cov8" title="1">{
+        return &amp;ReservationService{
+                reservationRepo: reservationRepo,
+                logger:          logger,
+        }
+}</span>
+
+
+func reqIDFromCtx(ctx context.Context) string <span class="cov8" title="1">{
+        reqID, _ := ctx.Value("requestID").(string)
+        return reqID
+}</span>
+
+
+func (s *ReservationService) ReserveRoom(ctx context.Context, req dtos.CreateBookingRequest) *dtos.APIResponse <span class="cov8" title="1">{
+        reqID := reqIDFromCtx(ctx)
+
+        if req.EndDate.Before(req.StartDate) || req.EndDate.Equal(req.StartDate) </span><span class="cov8" title="1">{
+                return utils.NewErrorResponse(http.StatusBadRequest, "end_date must be after start_date", []dtos.Error{
+                        {Field: "end_date", Message: "must be after start_date", Code: "VALIDATION_ERROR_400"},
+                }, reqID)
+        }</span>
+
+        <span class="cov8" title="1">room, dtoErr := s.reservationRepo.GetRoomByID(ctx, req.RoomID)
+        if dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("ReserveRoom: room lookup failed", zap.String("error", dtoErr.Message))
+                statusCode := http.StatusInternalServerError
+                if dtoErr.Code == "NOT_FOUND_404" </span><span class="cov0" title="0">{
+                        statusCode = http.StatusNotFound
+                }</span>
+                <span class="cov8" title="1">return utils.NewErrorResponse(statusCode, "room not found", []dtos.Error{*dtoErr}, reqID)</span>
+        }
+
+        <span class="cov8" title="1">available, dtoErr := s.reservationRepo.CheckRoomAvailability(ctx, req.RoomID, req.StartDate, req.EndDate)
+        if dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("ReserveRoom: availability check failed", zap.String("error", dtoErr.Message))
+                return utils.NewErrorResponse(http.StatusInternalServerError, "failed to check room availability", []dtos.Error{*dtoErr}, reqID)
+        }</span>
+        <span class="cov8" title="1">if !available </span><span class="cov8" title="1">{
+                return utils.NewErrorResponse(http.StatusConflict, "room is already booked for the requested period", []dtos.Error{
+                        {Field: "room_id", Message: "overlapping booking exists", Code: "CONFLICT_409"},
+                }, reqID)
+        }</span>
+
+        <span class="cov8" title="1">days := int(req.EndDate.Sub(req.StartDate).Hours() / 24)
+        totalPrice := room.Price * float64(days)
+
+        s.logger.Info("Price calculated",
+                zap.Int("days", days),
+                zap.Float64("room_price", room.Price),
+                zap.Float64("total_price", totalPrice),
+        )
+
+        customer, dtoErr := s.reservationRepo.GetCustomerByPhone(ctx, req.PhoneNumber)
+        if dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("ReserveRoom: phone lookup failed",
+                        zap.String("phone", req.PhoneNumber),
+                        zap.String("error", dtoErr.Message),
+                )
+                return utils.NewErrorResponse(http.StatusInternalServerError, "failed to lookup customer", []dtos.Error{*dtoErr}, reqID)
+        }</span>
+
+        <span class="cov8" title="1">if customer != nil </span><span class="cov8" title="1">{
+                s.logger.Info("Existing customer found, reusing record",
+                        zap.String("phone", req.PhoneNumber),
+                        zap.Uint("customer_id", customer.ID),
+                )
+        }</span> else<span class="cov8" title="1"> {
+                s.logger.Info("No existing customer, creating new record",
+                        zap.String("phone", req.PhoneNumber),
+                )
+                customer = &amp;models.Customer{
+                        UUID:        uuid.NewString(),
+                        Name:        req.Name,
+                        Age:         req.Age,
+                        Address:     req.Address,
+                        PhoneNumber: req.PhoneNumber,
+                        IsActive:    true,
+                        CreatedBy:   "system",
+                        UpdatedBy:   "system",
+                }
+                if dtoErr := s.reservationRepo.CreateCustomer(ctx, customer); dtoErr != nil </span><span class="cov8" title="1">{
+                        s.logger.Error("ReserveRoom: CreateCustomer failed", zap.String("error", dtoErr.Message))
+                        return utils.NewErrorResponse(http.StatusInternalServerError, "failed to create customer", []dtos.Error{*dtoErr}, reqID)
+                }</span>
+        }
+
+        <span class="cov8" title="1">booking := &amp;models.Booking{
+                UUID:       uuid.NewString(),
+                CustomerID: int(customer.ID),
+                RoomID:     req.RoomID,
+                StartDate:  req.StartDate,
+                EndDate:    req.EndDate,
+                Purpose:    req.Purpose,
+                TotalPrice: totalPrice,
+                IsActive:   true,
+                CreatedBy:  "system",
+                UpdatedBy:  "system",
+        }
+        if dtoErr := s.reservationRepo.CreateBooking(ctx, booking); dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("ReserveRoom: CreateBooking failed", zap.String("error", dtoErr.Message))
+                return utils.NewErrorResponse(http.StatusInternalServerError, "failed to create booking", []dtos.Error{*dtoErr}, reqID)
+        }</span>
+
+        <span class="cov8" title="1">s.logger.Info("Room reserved successfully",
+                zap.String("booking_uuid", booking.UUID),
+                zap.Uint("room_id", req.RoomID),
+                zap.Uint("customer_id", customer.ID),
+                zap.Float64("total_price", totalPrice),
+        )
+
+        return utils.NewSuccessResponse(http.StatusCreated, "Room reserved successfully", dtos.RoomResponse{
+                BookingID:  int(booking.ID),
+                RoomID:     int(req.RoomID),
+                Status:     "CONFIRMED",
+                TotalPrice: totalPrice,
+        }, reqID)</span>
+}
+
+
+func (s *ReservationService) CancelBooking(ctx context.Context, bookingID string) *dtos.APIResponse <span class="cov8" title="1">{
+        reqID := reqIDFromCtx(ctx)
+
+        if dtoErr := s.reservationRepo.CancelBooking(ctx, bookingID); dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("CancelBooking failed",
+                        zap.String("bookingID", bookingID),
+                        zap.String("error", dtoErr.Message),
+                )
+                statusCode := http.StatusInternalServerError
+                if dtoErr.Code == "NOT_FOUND" </span><span class="cov8" title="1">{
+                        statusCode = http.StatusNotFound
+                }</span>
+                <span class="cov8" title="1">return utils.NewErrorResponse(statusCode, "failed to cancel booking", []dtos.Error{*dtoErr}, reqID)</span>
+        }
+
+        <span class="cov8" title="1">s.logger.Info("Booking cancelled", zap.String("bookingID", bookingID))
+        return utils.NewSuccessResponse(http.StatusOK, "Booking cancelled successfully", dtos.CancelRoomResponse{
+                Status: "CANCELLED",
+        }, reqID)</span>
+}
+
+
+func (s *ReservationService) GetRooms(ctx context.Context) *dtos.APIResponse <span class="cov8" title="1">{
+        reqID := reqIDFromCtx(ctx)
+
+        rooms, total, dtoErr := s.reservationRepo.GetRooms(ctx)
+        if dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("GetRooms failed", zap.String("error", dtoErr.Message))
+                return utils.NewErrorResponse(http.StatusInternalServerError, "failed to fetch rooms", []dtos.Error{*dtoErr}, reqID)
+        }</span>
+
+        <span class="cov8" title="1">result := make([]dtos.GetAllRoomResponse, 0, len(rooms))
+        for _, r := range rooms </span><span class="cov8" title="1">{
+                result = append(result, dtos.GetAllRoomResponse{
+                        RoomID:    int(r.ID),
+                        RoomName:  r.RoomName,
+                        RoomType:  r.RoomType,
+                        Capacity:  r.Capacity,
+                        RoomFloor: r.RoomFloor,
+                        IsActive:  r.IsActive,
+                })
+        }</span>
+
+        <span class="cov8" title="1">resp := utils.NewSuccessResponse(http.StatusOK, "Rooms fetched successfully", result, reqID)
+        resp.Meta = &amp;dtos.Meta{Total: total}
+        return resp</span>
+}
+
+
+func (s *ReservationService) GetRoomByBookingID(ctx context.Context, bookingID string) *dtos.APIResponse <span class="cov8" title="1">{
+        reqID := reqIDFromCtx(ctx)
+
+        booking, dtoErr := s.reservationRepo.GetRoomByBookingID(ctx, bookingID)
+        if dtoErr != nil </span><span class="cov8" title="1">{
+                s.logger.Error("GetRoomByBookingID failed",
+                        zap.String("bookingID", bookingID),
+                        zap.String("error", dtoErr.Message),
+                )
+                statusCode := http.StatusInternalServerError
+                if dtoErr.Code == "NOT_FOUND" </span><span class="cov8" title="1">{
+                        statusCode = http.StatusNotFound
+                }</span>
+                <span class="cov8" title="1">return utils.NewErrorResponse(statusCode, "booking not found", []dtos.Error{*dtoErr}, reqID)</span>
+        }
+
+        <span class="cov8" title="1">return utils.NewSuccessResponse(http.StatusOK, "Room fetched successfully", dtos.GetRoomResponse{
+                BookingID: int(booking.ID),
+                RoomName:  booking.Room.RoomName,
+                RoomType:  booking.Room.RoomType,
+                RoomFloor: booking.Room.RoomFloor,
+                Capacity:  booking.Room.Capacity,
+                Price:     booking.Room.Price, 
+        }, reqID)</span>
+}</pre>
+		
+		<pre class="file" id="file8" style="display: none">package utils
+
+import (
+    "encoding/json"
+    "fmt"
+    "net/http"
+    "time"
+    "github.com/google/uuid"
+    "room_booking_management/room_booking_service/internal/dtos"
+    "room_booking_management/room_booking_service/internal/errorcodes"
+
+    "github.com/go-playground/validator/v10"
+)
+
+var validate = validator.New()
+
+func WriteResponse(w http.ResponseWriter, code int, data interface{}) <span class="cov8" title="1">{
+    if w.Header().Get("Content-Type") == "" </span><span class="cov8" title="1">{
+        w.Header().Set("Content-Type", "application/json")
+    }</span>
+    <span class="cov8" title="1">w.WriteHeader(code)
+    if err := json.NewEncoder(w).Encode(data); err != nil </span><span class="cov8" title="1">{
+        http.Error(w, err.Error(), http.StatusInternalServerError)
+    }</span>
+}
+
+func ValidateStruct(s interface{}) []dtos.Error <span class="cov8" title="1">{
+    var validationErrors []dtos.Error
+
+    if err := validate.Struct(s); err != nil </span><span class="cov8" title="1">{
+        if validationErrs, ok := err.(validator.ValidationErrors); ok </span><span class="cov8" title="1">{
+            for _, err := range validationErrs </span><span class="cov8" title="1">{
+                validationErrors = append(validationErrors, dtos.Error{
+                    Field:   err.Field(),
+                    Message: fmt.Sprintf("Validation failed for the field '%s' on the '%s' constraint.", err.Field(), err.Tag()),
+                    Code:    string(errorcodes.ErrCodeValidation),
+                })
+            }</span>
+        } else<span class="cov8" title="1"> {
+            validationErrors = append(validationErrors, dtos.Error{
+                Field:   "unknown",
+                Message: err.Error(),
+                Code:    string(errorcodes.ErrCodeInternal),
+            })
+        }</span>
+    }
+
+    <span class="cov8" title="1">return validationErrors</span>
+}
+
+func MapErrorCode(apiResponse *dtos.APIResponse) *dtos.APIResponse <span class="cov8" title="1">{
+    if len(apiResponse.Errors) == 0 </span><span class="cov8" title="1">{
+        apiResponse.Code = http.StatusOK
+        return apiResponse
+    }</span>
+
+    <span class="cov8" title="1">switch apiResponse.Errors[0].Code </span>{
+    case string(errorcodes.ErrCodeNotFound):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusNotFound</span>
+    case string(errorcodes.ErrCodeValidation):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusBadRequest</span>
+    case string(errorcodes.ErrCodeInternal):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusInternalServerError</span>
+    case string(errorcodes.ErrCodeUnauthorized):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusUnauthorized</span>
+    case string(errorcodes.ErrCodeBadRequest):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusBadRequest</span>
+    case string(errorcodes.ErrCodeConflict):<span class="cov8" title="1">
+        apiResponse.Code = http.StatusConflict</span>
+    default:<span class="cov8" title="1">
+        apiResponse.Code = http.StatusInternalServerError</span>
+    }
+
+    <span class="cov8" title="1">return apiResponse</span>
+}
+func GetOrGenerateRequestID(r *http.Request) string<span class="cov8" title="1">{
+        reqID := r.Header.Get("X-Request-ID")
+        if reqID == ""</span><span class="cov8" title="1">{
+                reqID = uuid.NewString()
+        }</span>
+        <span class="cov8" title="1">return reqID</span>
+}
+
+func NewErrorResponse(code int, message string, errs []dtos.Error,reqID string) *dtos.APIResponse <span class="cov8" title="1">{
+    status := "fail"
+    if code &gt;= 500 </span><span class="cov8" title="1">{
+        status = "error"
+    }</span>
+    <span class="cov8" title="1">return &amp;dtos.APIResponse{
+        Status:    status,
+        Code:      code,
+        Message:   message,
+        Errors:    errs,
+                RequestID: reqID,
+        Timestamp: time.Now().UTC().Format(time.RFC3339),
+    }</span>
+}
+
+
+func NewSuccessResponse(code int, message string, data interface{},reqID string) *dtos.APIResponse <span class="cov8" title="1">{
+    return &amp;dtos.APIResponse{
+        Status:    "success",
+        Code:      code,
+        Message:   message,
+        Data:      data,
+                RequestID: reqID,
+        Timestamp: time.Now().UTC().Format(time.RFC3339),
+    }
+}</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

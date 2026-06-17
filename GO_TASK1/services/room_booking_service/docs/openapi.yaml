@@ -1,0 +1,563 @@
+openapi: 3.0.3
+
+info:
+  title: Room Booking API
+  description: API for Room Booking Management
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8080
+    description: Development Server
+
+tags:
+  - name: RoomBookingManagement
+    description: Room Booking Operations
+
+paths:
+
+  /api/v1/reservations:
+    post:
+      tags:
+        - RoomBookingManagement
+      summary: Create room booking
+      description: Book a room for a customer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BookingRequest'
+            example:
+              name: "Kirthikaa"
+              age: 22
+              address: "Tambaram, Chennai"
+              phone_number: "9123456780"
+              purpose: "Project Meeting"
+              room_id: 3
+              room_floor: 3
+              room_name: "sunrise"
+              start_date: "2026-06-01T09:00:00Z"
+              end_date: "2026-06-03T09:00:00Z"
+      responses:
+        '201':
+          description: Booking created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingResponse'
+              example:
+                code: 201
+                status: "success"
+                message: "Room booked successfully"
+                data:
+                  booking_id: 205
+                  room_id: 3
+                  booking_status: "booked"
+                  price: 420
+                error: null
+                request_id: "5d7a1f18-4a33-4d90-a410-7c09c29f91d2"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                status: "error"
+                message: "Invalid room_id provided"
+                data: null
+                errors:
+                  - field: "Room ID"
+                    message: "The room ID you entered does not exist or is not available"
+                    code: "Invalid"
+                request_id: "d1c4d7a9-3c2a-4be6-8a77-748d9a42f9b1"
+        '409':
+          description: Overlapping Exit
+          content:
+            application/json:  
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 409
+                status: "error"
+                message: "Overlapping Exit"
+                data: null
+                errors:
+                  - field: "Room ID"
+                    message: "Overlapping booking exit"
+                    code: "CONFLICT_409"
+                request_id: "d1c4d7a9-3c2a-4be6-8a77-748d9a42f9b1"
+        '404':
+          description: Room not available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                status: "error"
+                message: "Room not available for the selected duration"
+                data: null
+                errors:
+                  - field: "Room ID"
+                    message: "Room not available for the selected duration"
+                    code: "Not found"
+                request_id: "8a41c9f0-d3c4-4895-b2b1-35efad9ce921"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                status: "error"
+                message: "Unexpected server error occurred"
+                data: null
+                errors:
+                  - field: "Server Error"
+                    message: "Unexpected server error occurred"
+                    code: "Internal error"
+                request_id: "b94a9c53-9f96-4e5f-87ae-387aecc2d7e4"
+
+  /api/v1/rooms:
+    get:
+      tags:
+        - RoomBookingManagement
+      summary: Get all rooms
+      description: Retrieve all active room details
+      responses:
+        '200':
+          description: All rooms retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RoomListResponse'
+              example:
+                code: 200
+                status: "success"
+                message: "All rooms retrieved successfully"
+                data:
+                  - room_id: 10
+                    room_name: "Deluxe Room"
+                    type: "AC"
+                    price: 300
+                    capacity: 2
+                    floor: 2
+                    is_active: true
+                  - room_id: 11
+                    room_name: "Suite Room"
+                    type: "AC"
+                    price: 450
+                    capacity: 3
+                    floor: 4
+                    is_active: true
+                  - room_id: 12
+                    room_name: "Standard Room"
+                    type: "NON-AC"
+                    price: 280
+                    capacity: 2
+                    floor: 1
+                    is_active: true
+                error: null
+                request_id: "b61bb4e7-fd41-48cc-a2eb-18d33c9d228a"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                status: "error"
+                message: "Failed to retrieve rooms"
+                data: null
+                errors:
+                  - field: "Server Error"
+                    message: "Internal server error, failed to retrieve rooms"
+                    code: "Internal error"
+                request_id: "3ebaf0de-8e65-46e2-8df3-f1b7f44c8842"
+
+  /api/v1/rooms/{bookingID}:
+    get:
+      tags:
+        - RoomBookingManagement
+      summary: Get booking details by booking ID
+      description: Fetch specific booking details by booking ID
+      parameters:
+        - name: bookingID
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "ffe700b9-3d36-4694-9c91-46a84e3a762a"
+      responses:
+        '200':
+          description: Booking details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BookingDetailsResponse'
+              example:
+                code: 200
+                status: "success"
+                message: "Booking details retrieved successfully"
+                data:
+                  booking_id: 205
+                  capacity: 3
+                  room_type: "AC"
+                  room_floor: 4
+                  price: 450
+                error: null
+                request_id: "e137e7b1-6b6c-4d5a-993b-b6b49b9e0a52"
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                status: "error"
+                message: "Booking ID not found"
+                data: null
+                errors:
+                  - field: "Booking ID"
+                    message: "The booking ID you are trying to access is not available"
+                    code: "Not found"
+                request_id: "77e9322f-ff25-44f1-9c28-7c9f79c64b93"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                status: "error"
+                message: "Failed to retrieve booking details"
+                data: null
+                errors:
+                  - field: "Server Error"
+                    message: "Internal server error, failed to retrieve booking details"
+                    code: "Internal error"
+                request_id: "3ebaf0de-8e65-46e2-8df3-f1b7f44c8842"
+
+  /api/v1/reservations/{bookingID}/cancel:
+    put:
+      tags:
+        - RoomBookingManagement
+      summary: Cancel booked room
+      description: Cancel a booked room by booking ID with room_id in request body
+      parameters:
+        - name: bookingID
+          in: path
+          required: true
+          schema:
+            type: string
+          example: "ffe700b9-3d36-4694-9c91-46a84e3a762a"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBookingRequest'
+            example:
+              room_id: 3
+      responses:
+        '200':
+          description: Booking cancelled successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateBookingResponse'
+              example:
+                code: 200
+                status: "success"
+                message: "Selected room cancelled successfully"
+                data:
+                  booking_status: "cancelled"
+                error: null
+                request_id: "c9b9dc7a-83cc-4c84-9f9f-17985c6c6266"
+        '400':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 400
+                status: "error"
+                message: "Invalid booking_id"
+                data: null
+                errors:
+                  - field: "Booking ID"
+                    message: "The booking ID you are trying to access is invalid"
+                    code: "Invalid"
+                request_id: "6c342f69-6ea4-4f94-9ebd-fb77b5f6f607"
+        '404':
+          description: Booking not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 404
+                status: "error"
+                message: "Booking ID not found"
+                data: null
+                errors:
+                  - field: "Booking ID"
+                    message: "The booking ID you are trying to access is not available"
+                    code: "Not found"
+                request_id: "1b1e19b2-8421-4a5b-bc9f-3fd32b7090e1"
+        '500':
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                code: 500
+                status: "error"
+                message: "Cancellation failed due to server error"
+                data: null
+                errors:
+                  - field: "Server Error"
+                    message: "Internal server error, failed to cancel the room"
+                    code: "Internal error"
+                request_id: "bfe29d7d-99fa-40df-9d94-ec0fa76a5fb2"
+
+components:
+  schemas:
+
+    BookingRequest:
+      type: object
+      required:
+        - name
+        - age
+        - address
+        - phone_number
+        - purpose
+        - room_id
+        - room_floor
+        - room_name
+        - start_date
+        - end_date
+      properties:
+        name:
+          type: string
+          example: "Kirthikaa"
+        age:
+          type: integer
+          example: 22
+        address:
+          type: string
+          example: "Tambaram, Chennai"
+        phone_number:
+          type: string
+          example: "9123456780"
+        purpose:
+          type: string
+          example: "Project Meeting"
+        room_id:
+          type: integer
+          example: 3
+        room_floor:
+          type: integer
+          example: 3
+        room_name:
+          type: string
+          example: "sunrise"
+        start_date:
+          type: string
+          format: date-time
+          example: "2026-06-01T09:00:00Z"
+        end_date:
+          type: string
+          format: date-time
+          example: "2026-06-03T09:00:00Z"
+
+    BookingResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 201
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Room booked successfully"
+        data:
+          type: object
+          properties:
+            booking_id:
+              type: integer
+              example: 205
+            room_id:
+              type: integer
+              example: 3
+            booking_status:
+              type: string
+              example: "booked"
+            price:
+              type: number
+              example: 420
+        error:
+          nullable: true
+          example: null
+        request_id:
+          type: string
+          example: "5d7a1f18-4a33-4d90-a410-7c09c29f91d2"
+
+    RoomListResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "All rooms retrieved successfully"
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              room_id:
+                type: integer
+                example: 10
+              room_name:
+                type: string
+                example: "Deluxe Room"
+              type:
+                type: string
+                example: "AC"
+              price:
+                type: number
+                example: 300
+              capacity:
+                type: integer
+                example: 2
+              floor:
+                type: integer
+                example: 2
+              is_active:
+                type: boolean
+                example: true
+        error:
+          nullable: true
+          example: null
+        request_id:
+          type: string
+          example: "b61bb4e7-fd41-48cc-a2eb-18d33c9d228a"
+
+    BookingDetailsResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Booking details retrieved successfully"
+        data:
+          type: object
+          properties:
+            booking_id:
+              type: integer
+              example: 205
+            capacity:
+              type: integer
+              example: 3
+            room_type:
+              type: string
+              example: "AC"
+            floor:
+              type: integer
+              example: 4
+            price:
+              type: number
+              example: 450
+        error:
+          nullable: true
+          example: null
+        request_id:
+          type: string
+          example: "e137e7b1-6b6c-4d5a-993b-b6b49b9e0a52"
+
+    UpdateBookingRequest:
+      type: object
+      required:
+        - room_id
+      properties:
+        room_id:
+          type: integer
+          example: 3
+
+    UpdateBookingResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 200
+        status:
+          type: string
+          example: "success"
+        message:
+          type: string
+          example: "Selected room cancelled successfully"
+        data:
+          type: object
+          properties:
+            booking_status:
+              type: string
+              example: "cancelled"
+        error:
+          nullable: true
+          example: null
+        request_id:
+          type: string
+          example: "c9b9dc7a-83cc-4c84-9f9f-17985c6c6266"
+
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          type: integer
+          example: 400
+        status:
+          type: string
+          example: "error"
+        message:
+          type: string
+          example: "Invalid request"
+        data:
+          nullable: true
+          example: null
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: "Room ID"
+              message:
+                type: string
+                example: "The room ID you entered does not exist"
+              code:
+                type: string
+                example: "Internal error"
+        request_id:
+          type: string
+          example: "d1c4d7a9-3c2a-4be6-8a77-748d9a42f9b1"

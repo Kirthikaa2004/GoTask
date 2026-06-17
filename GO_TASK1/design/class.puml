@@ -1,0 +1,292 @@
+@startuml Room Booking Management
+skinparam Linetype ortho
+
+package "Main Layer" {
+    class Main {
+        +main()
+    }
+}
+
+package "Server Layer" {
+    class Application {
+        -Logger: *Logger
+        -Router: *mux.Router
+        -Config: *Config
+        -DBService: DBConnector
+    }
+
+    class ServerFunctions {
+        +InitializeApp(env: string): (*Application, error)
+        +RunServer(app: *Application): error
+        +GetCorsOptions(): cors.Options
+    }
+}
+
+package "Config Layer" {
+    class Config {
+        +Port: string
+        +DatabaseURL: string
+        +ProjectRoot: string
+        +BaseUrl: string
+        +LogLevel: string
+        +LogDir: string
+        +LogFileName: string
+    }
+
+    class ConfigFunctions {
+        +LoadConfig(serviceName, env: string): (*Config, error)
+    }
+}
+
+package "Handlers Layer" {
+    class ReservationHandler {
+        -reservationService: ReservationServiceInterface
+        -logger: *Logger
+        +ReserveRoom(w: ResponseWriter, r: *Request)
+        +CancelBooking(w: ResponseWriter, r: *Request)
+        +GetRooms(w: ResponseWriter, r: *Request)
+    }
+
+    interface ReservationHandlerInterface {
+        +ReserveRoom(w: ResponseWriter, r: *Request)
+        +CancelBooking(w: ResponseWriter, r: *Request)
+        +GetRooms(w: ResponseWriter, r: *Request)
+    }
+
+    class RouteSetup {
+        +SetupRoutes(router: *mux.Router, db: *Db, logger: *Logger, cfg: *Config)
+    }
+}
+package "Service Layer" {
+
+    interface ReservationServiceInterface {
+        +ReserveRoom(ctx: Context, req: CreateBookingRequest): *APIResponse
+        +CancelBooking(ctx: Context, bookingID: string): *APIResponse
+        +GetRooms(ctx: Context): *APIResponse
+        +GetRoomByBookingID(ctx: Context, bookingID: string): *APIResponse
+    }
+
+    class ReservationService {
+        -reservationRepo: ReservationRepositoryInterface
+        -logger: *Logger
+        +ReserveRoom(ctx: Context, req: CreateBookingRequest): *APIResponse
+        +CancelBooking(ctx: Context, bookingID: string): *APIResponse
+        +GetRooms(ctx: Context): *APIResponse
+        +GetRoomByBookingID(ctx: Context, bookingID: string): *APIResponse
+    }
+}
+
+package "Repository Layer" {
+
+    interface ReservationRepositoryInterface {
+        +CreateBooking(ctx: Context, booking: *Booking): *Error
+        +CancelBooking(ctx: Context, bookingID: string): *Error
+        +GetRooms(ctx: Context): ([]Room, int64, *Error)
+        +GetRoomByBookingID(ctx: Context, bookingID: string): (*Room, *Error)
+    }
+
+    class ReservationRepository {
+        -db: *Db
+        -logger: *Logger
+        +CreateBooking(ctx: Context, booking: *Booking): *Error
+        +CheckRoomAvalaibilty(ctx: Context, booking: *Booking): *Error
+        +CreateOrGetCustomer(CreateBooking(ctx: Context, booking: *Booking): *Error
+        +CancelBooking(ctx: Context, bookingID: string): *Error
+        +GetRooms(ctx: Context): ([]Room, int64, *Error)
+        +GetRoomByBookingID(ctx: Context, bookingID: string): (*Room, *Error)
+    }
+}
+
+package "Database Layer" {
+    interface DBConnector {
+        +EstablishConnection(dbURL: string): (*Db, error)
+    }
+
+    class DBService {
+        +EstablishConnection(dbURL: string): (*Db, error)
+    }
+
+    class Db {
+        +Gorm: *gorm.DB
+        +SqlDb: *sql.DB
+    }
+
+    class Migration {
+        +AutoMigrate(db: *Db, logger: *Logger): error
+    }
+}
+
+package "Models" {
+    class Customer {
+        +ID: uint
+        +UUID: string
+        +Name: string
+        +Age: int
+        +Address: string
+        +PhoneNumber : string
+        +CreatedAt: time.Time
+        +UpdatedAt: time.Time
+        +CreatedBy: string
+        +UpdatedBy: string
+        +isActive: bool
+        +TableName(): string
+    }
+    class Room{
+        +ID: uint
+        +UUID: string
+        +Price: float64
+        +RoomType : string
+        +Floor : uint
+        +Room_Name : string
+        +Capacity: int
+        +CreatedAt: time.Time
+        +UpdatedAt: time.Time
+        +CreatedBy: string
+        +UpdatedBy: string
+        +isActive: bool
+        +TableName(): string
+    }
+    class Booking{
+        +ID: uint
+        +UUID: string
+        +CustomerId: int
+        +RoomId: int
+        +StartDate: Timestamp
+        +EndDate: Timestamp
+        +Purpose : string
+        +CreatedAt: time.Time
+        +UpdatedAt: time.Time
+        +CreatedBy: string
+        +UpdatedBy: 
+        +isActive: bool
+        +TableName(): string
+    }
+
+}
+
+package "DTOs" {
+    class APIResponse {
+        +Status: string
+        +Code: int
+        +Message: string
+        +Data: interface{}
+        +Errors: []Error
+        +Meta: *Meta
+        +RequestID: string
+        +Timestamp: string
+    }
+
+    class Error {
+        +Field: string
+        +Message: string
+        +Code: string
+    }
+
+    class CreateBookingRequest {
+        +Name: string
+        +Age: int
+        +Address: string
+        +PhoneNumber: string
+        +RoomId: uint
+        +Purpose: string
+        +Floor: uint
+        +StartDate: Timestamp
+        +EndDate: Timestamp
+    }
+
+    class CancelBookingRequest {
+        +BookingId: int
+        +RoomId: int
+    }
+
+    class RoomResponse {
+        +BookingId: int
+        +RoomId: int
+        +status: string
+        +Price: decimal
+    }
+
+    class CancelRoomResponse {
+        +Status : string
+    }
+    class GetAllRoomResponse{
+        +RoomId: int
+        +RoomType: string
+        +Capacity: int
+        +Price: int
+        +Floor: string
+        +RoomName: string
+        +isActive: bool
+    }
+    class GetRoomResponse{
+         +BookingId: int
+         +CustomerName: string
+         +Capacity: int
+         +RoomType: string
+         +price: float64
+    }
+}
+
+package "Utilities Layer" {
+    class Utils {
+        +WriteResponse(w: ResponseWriter, code: int, data: interface{})
+        +ValidateStruct(s: interface{}): []Error
+        +MapErrorCode(apiResponse: *APIResponse): *APIResponse
+    }
+}
+
+package "Logger Layer" {
+    class Logger {
+        -zap: *zap.Logger
+        +Info(msg: string, fields: ...zap.Field)
+        +Error(msg: string, fields: ...zap.Field)
+        +Warn(msg: string, fields: ...zap.Field)
+        +Fatal(msg: string, fields: ...zap.Field)
+        +Sync()
+    }
+
+    class LogConfig {
+        +Level: string
+        +LogDir: string
+        +FileName: string
+        +ServiceName: string
+    }
+}
+
+package "Error Codes" {
+    class ErrorCodes {
+        +ErrorCodeStatus: map[ErrorCode]string
+    }
+}
+
+Main --> ServerFunctions: Calls InitializeApp
+ServerFunctions --> Application: Creates
+ServerFunctions --> ConfigFunctions: Loads Config
+ServerFunctions --> DBService: Establishes Connection
+ServerFunctions --> Migration: Runs AutoMigrate
+ServerFunctions --> RouteSetup: Sets up Routes
+Application --> Logger: Uses
+Application --> Config: Uses
+RouteSetup --> ReservationHandler : Creates
+ReservationHandler --> ReservationHandlerInterface : Implements
+ReservationHandler --> ReservationServiceInterface : Uses
+ReservationService --> ReservationServiceInterface : Implements
+ReservationService --> ReservationRepositoryInterface : Uses
+ReservationRepository --> ReservationRepositoryInterface : Implements
+ReservationRepository --> Db: Uses
+DBService --> DBConnector: Implements
+DBService --> Db: Creates
+ReservationHandler --> Utils: Uses
+ReservationHandler--> CreateBookingRequest: Validates
+ReservationHandler --> CancelBookingRequest: Validates
+ReservationService  --> APIResponse: Returns
+ReservationService --> Booking: Creates
+ReservationRepository --> Booking: Queries
+Migration --> Booking: Migrates
+Migration --> Customer : Migrates 
+Migration --> Room : Migrates 
+
+
+Utils --> ErrorCodes: Uses
+
+@enduml

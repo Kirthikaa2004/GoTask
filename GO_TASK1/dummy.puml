@@ -1,0 +1,523 @@
+@startuml Room_booking_Management_sequence_diagram
+autonumber
+skinparam MaxMessageSize 300
+ 
+title Room Booking Management Service - Detailed Sequence Diagram
+actor Client
+ 
+participant "Main" as Main
+participant "Server\n(InitializeApp)" as Server
+participant "Config\n(LoadConfig)" as Config
+participant "Logger" as Logger
+participant "Router\n(mux.Router)" as Router
+participant "Migrations\n" as Migrations
+participant "BookHandler" as Handler
+participant "Utils" as Utils
+participant "BookingService" as Service
+participant "BookingRepository" as Repository
+participant "Database\n(DBService)" as DB
+ 
+note over Main
+package main
+import "booking-service/pkg/server"
+end note
+ 
+note over Server
+package server
+import "github.com/gorilla/mux"
+import "github.com/rs/cors"
+end note
+ 
+note over Config
+package config
+import "fmt"
+import "os"
+import "github.com/joho/godotenv"
+end note
+ 
+note over Utils
+import "encoding/json"
+import "fmt"
+import "booking-service/internal/dtos"
+import "booking-service/internal/errorcodes"
+import "net/http"
+import "github.com/go-playground/validator/v10"
+end note
+ 
+note over DB
+package database
+import "database/sql"
+import "strings"
+import "github.com/microsoft/go-mssqldb"
+import "github.com/mattn/go-sqlite3"
+import "gorm.io/driver/sqlite"
+import "gorm.io/driver/sqlserver"
+import "gorm.io/gorm"
+end note
+ 
+note over Logger
+package loggers
+import "fmt"
+import "os"
+import "path/filepath"
+import "go.uber.org/zap"
+import "go.uber.org/zap/zapcore"
+end note
+ 
+note over Router
+package routers
+import "fmt"
+import "net/http"
+import "os"
+import "path/filepath"
+import "strings"
+import "booking-service/internal/config"
+import "booking-service/internal/loggers"
+import "booking-service/internal/repository"
+import "booking-service/internal/services"
+import "booking-service/pkg/database"
+import "github.com/gorilla/mux"
+end note
+ 
+ 
+note over Migrations
+package migraions
+import "booking-service/internal/models"
+import "booking-service/internal/loggers"
+end note
+ 
+note over Handler
+package handlers
+import "github.com/gorilla/mux"
+import "booking-service/internal/services"
+import "booking-service/internal/dtos"
+end note
+ 
+note over Service
+package services
+import "booking-service/internal/repository"
+import "booking-service/internal/models"
+import "github.com/google/uuid"
+end note
+ 
+note over Repository
+package repository
+import "gorm.io/gorm"
+import "booking-service/pkg/database"
+import "booking-service/internal/models"
+end note
+ 
+group Main()
+    Main->Main: use flag.String() and define the name env for it and provide the default name as dev and provide description message as Environment(dev,qc,uat,prod)
+    activate Main
+    Main->Main: then assign it to the variable env
+    Main->Main: use flag.Parse() which visit the command line terminal and check the input for example go run main.go env=dev like that it parsing it and assign it to the env
+    Main->Server: declare a variable app and err and call the InitializeApp function and pass the env to it
+    group InitializeApp()
+        activate Server
+        Server->Config: create a variable cfg and err and call the function LoadConfig() and pass the service name booking-service and the env to it
+        group LoadConfig()
+            activate Config
+                Config->Config: provide the root path of the env file based on the env for example if dev is passed the developer env should be get like that
+                alt if godotenv.Load() envFile
+                    alt if not exists
+                        Config->Config: if envFile is unable to load which means os.IsNotExist(err) then through "env file isnt present continuing without env file"
+                    else
+                        Config->Config: if any other error is thrown then throw like failed to load envfile like that and return it
+                    end
+                end
+                Config->Config:create a variable config and then use the struct Config{} which have Port, databaseurl,projectroot and the baseurl and define field here by calling the getEnv() function and pass the key value within it for example "PORT",DATABASE_URL,PROJECT_ROOT, and BASE_URL
+                group getEnv()
+                    alt if the value is not nil
+                        Config->Config: use Getenv() and pass the key to it and get the value of each caller if not unable to get then return empty string
+                    end
+                end
+                Config-->Server: return the config and also the nil to the caller
+            deactivate Config
+        end
+        Server -> Logger: NewLogger(LogConfig{Level, LogDir, FileName, ServiceName})
+        group NewLogger()
+            activate Logger
+                Logger -> Logger: os.MkdirAll(logDir)
+                Logger -> Logger: os.OpenFile(filePath)
+                Logger -> Logger: zap.New(core, AddCaller)
+                Logger --> Server: *Logger
+            deactivate Logger
+        end
+        Server->Server: create a variable dbService and use the &database.DBService{}
+        Server -> DB:create a variables db and err and call EstablishConnection()function and pass the cfg.DatabaseURL to it
+        group EstablishConnection()
+            activate DB
+            DB->DB: declare a variable dialector with type gorm.Dialector this variable stores which database driver should be used\nfor example sqlite or sqlserver
+            alt if strings.HasPrefix()
+                DB->DB: use strings.HasPrefix() and check whether the dbURL starts with sqlite:// example sqlite://test.db
+                DB->DB: create a variable dbPath and use strings.TrimPrefix() to remove sqlite:// from the URL\nexample sqlite://test.db becomes test.db
+                DB->DB: assign sqlite.Open(dbPath) into dialector this prepares the sqlite driver with the database file path
+            else if strings.HasPrefix()
+                DB->DB: check whether the dbURL starts with sqlserver:// example sqlserver://localhost:1433
+                DB->DB: assign sqlserver.Open(dbURL) into dialector\nthis prepares the sqlserver database driver using the provided URL
+            else
+                DB->DB: if no known prefix is matched then default to sqlserver.Open(dbURL)
+                DB->DB: assign sqlserver.Open(dbURL) into dialector this acts as the fallback database driver
+            end
+            DB->DB: create variables db and err and call gorm.Open() pass the dialector and &gorm.Config{} gorm.Open() establishes the GORM database connection
+            alt if err != nil
+                DB-->Server: return nil and err this means the database connection creation failed
+            end
+            DB->DB: create variables sqlDB and err and call db.DB() this converts the GORM database instance into native sql.DB object
+            alt if err != nil
+                DB-->Server: return nil and err this means unable to extract the native sql.DB instance
+            end
+            DB->DB: call sqlDB.Ping() Ping() checks whether the database is reachable and alive
+            alt if err := sqlDB.Ping(); err != nil
+                DB-->Server: return nil and err this means the database server is unreachable or connection failed
+            end
+            DB->DB: create and return &Db{} assign Gorm field with db assign SqlDb field with sqlDB
+            DB-->Server: return &Db{Gorm: db, SqlDb: sqlDB}, nil successful database connection object is returned
+           
+        end
+        Server->DB: create a variable err and call database.AutoMigrate() and pass the db and logger to it
+        group AutoMigrate()
+            DB->DB: create a variable err and use db.Gorm.AutoMigrate() then add models like Rooms,Customers,Bookings and Booking_rooms/ to it
+            alt if err is not nil
+                DB->Server: return err to the server shows failed to run migrations and shows internal server 500 to it
+            end
+            DB-->Server: return nil to the server caller function
+        end
+        alt if migration failed
+            DB-->Server: if unable to connect the db automigrate then through the error and return nil and err
+            deactivate DB
+            Server-->Main: throw internal server error 500
+            Main-->Client:upwards and forwards the error to the client and raise the internal server error 500
+        end
+        Server->Server: create a variable router and assign mux.NewRouter() to it to use gorrilla mux
+        Server->Router: use handlers and call the SetUpRoutes functions in the routes and pass this above router, db, logger and cfg to it
+        activate Router
+        group SetupRoutes()
+            Router->Router: create a variable bookRepo and use repostiory and initialize its NewBookRepository with passing db and logger to it
+            Router->Router: create a variable bookService and use services and injects the bookRepo and logger to the NewBookService
+            Router->Router: create a variable bookHandler and use NewBookHandler and inject the bookService and logger to it
+            Router->Router: create a variable api and setup the router path prefix as "book/api/v1"
+            Router->Router: and use api.HandleFunc() and the endpoint as bookings and use the bookHandler.BookRoom and define its method as post
+            Router->Router: then again use the same endpoint and register the other functions like GetRooms and CancelRoom to it with the GET method and PATCH method
+            deactivate Router
+        end
+        Server-->Main: assign the filed logger,router,cfg,dbservice with respective field of the Application struct and return it to the main
+        alt if recive an err
+            Main-->Client: raise standardize error and throw like failed to initialize the app then close the terminal by providing the os.Exit as 1
+        end
+        Main->Server: call the server.RunServer() and pass the app to it
+        alt if err is not nil
+            Main-->Client: raise the message like failed to start the server
+            deactivate Main
+        end
+        group GetCorsOptions()
+            Server->Server: return the cors options with allowedOrigins, allowed methods and allowedheaders to it
+        end
+        group RunServer()
+            Server->Server: create a variable corsOpts and assign the GetCorsOptions() functions to it
+            Server->Server: create a variable handler and bind the corsOpts with the Handler and app.router tell the server like first entering corsmiddleware then register routes and go to handlers
+            Server->Server: use http.ListenAndServe() and pass the port number eg: 8080 by using app.config.Port and assign the handler here
+        end
+        deactivate Server
+    end
+end
+ 
+Client->Handler: POST book/api/v1/users \n {"customer_name:"viswa",age:21,address:"chennai",phone:"1234561231",room_id: [1,2],}
+    activate Handler
+    Handler->Handler: use the function BookRoom(w,r)
+    group BookRoom()
+        Handler->Handler: initialize the dtos.RoomBookRequest to the req
+        Handler -> Handler:use json.NewDecoder() and pass the r.Body to it.Decode() the request body so pass the &req to it
+        alt if JSON decode fails
+            Handler -> Utils: WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Invalid request format"})
+            activate Utils
+            group WriteResponse()
+                alt if the content type is empty
+                    Utils->Utils: in w.header() get the content type and check it is empty if it is empty
+                    Utils->Utils: then set the content type as application/json
+                end
+                Utils->Utils: pass the status code to w.WriteHeader()
+                alt if error in encoding
+                    Utils-->Client: raise the internal server error and forwards it to the client
+                    note over Client
+                    {
+                        code:500,
+                        status:"error",
+                        message:"Internal server error",
+                        data:None,
+                        error:{"type": "HandlerException", "details": str(e)},
+                        request_id:request_id,
+                        timestamp: timestamp,
+                    }
+                    end note
+                end
+            end
+            Utils --> Client: upward and raise the error to the client
+            note over Client
+            {
+                code:400,
+                status:"error",
+                message:"Invalid request format",
+                data:None,
+                error:{"type": "HandlerException", "details": str(e)},
+                request_id:request_id,
+                timestamp: timestamp,
+            }
+            end note
+        end
+        Handler -> Utils: then use ValidateStruct() and pass the request body &req to it to verify it has the valid required field format or not according to the RoomBookRequest dtos
+           
+                Utils -> Utils: validate.Struct(s) using go-playground/validator
+                Utils --> Handler: []Error (empty if valid)
+           
+        alt if validation errors exist
+            Handler -> Utils:  Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Validation failed"})
+            Utils --> Client: raise and forward the error to the client
+            note over Client
+            {
+                "code":400,
+                "status":"error",
+                "message":"Invalid request format",
+                "data":None,
+                "error":{"type": "HandlerException", "details": str(e)},
+                "request_id":request_id,
+                "timestamp": timestamp,
+            }
+            end note
+        end
+        alt if req.StartTime is after req.EndTime
+            Handler -> Utils:  Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Validation failed"})
+            Utils --> Client: raise and forward the error to the client
+            note over Client
+            {
+                "code":400,
+                "status":"error",
+                "message":"Invalid request format",
+                "data":None,
+                "error":{"type": "HandlerException", "details": str(e)},
+                "request_id":request_id,
+                "timestamp": timestamp,
+            }
+            end note
+        end
+        Handler -> Service:call the BookRoom() function and pass the context ctx and request body after the decode of the json body req to it
+        group BookRoom() Service Layer
+            activate Service
+            Service->Service: create a variable customer and initialize models.Customer{}
+            Service->Service: use the models.Customers{} and assign the id,customer_id,name,age,address,phone_number,created_at,created_by,updated_at, updated_by with the respective fields and have the variable named customers
+            Service->Repository: create a variable CustomerId and err and call the function GetOrCreateCustomer() and pass the ctx and the customer to it
+            activate Repository
+            group GetOrCreateCustomer()-ctx,input Customer
+                Repository->DB: create variable result and use db.Where() and use the field "phone_number=?" to it with the customer.phoneNumber and if it it exists retrive the first matched record otherwise  inserts a new customer record to do these use FirstOrCreate() and pass the customer data to it
+                activate DB
+                note over Repository
+                    db.Gorm.Where("phone_number=?",customer.PhoneNumber).FirstOrCreate(customer)
+                end note
+                alt if result.Error is not nil
+                    Repository->Service: return the customerid as nil and the error field return dtos.error{} with status code and the message like failed to create or get customer
+                end  
+                Repository->Service: return the valid customer.customerId and nil to the service layer
+            end
+            alt if err is not nil
+                Service-->Handler:create a api response with the status code 500 and denoted as internal server error and pass it to the handler
+                Handler-->Utils: Refer (62) WriteResponse(w, 500, APIResponse{Status:"Error", Message:"Internal server error"})
+                Utils-->Client: raise and forward the error to the client
+                note over Client
+                {
+                    code:500,
+                    status:"error",
+                    message:"Internal server error cannot create customer",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note  
+            end
+            Service->Repository: create a variable room and err and call the GetRoomById function() and pass the list of the req.roomIds to it
+            group GetRoomById()-list of roomIds
+                Repository->Repository: create a variable rooms and assign the [] models.Rooms
+                Repository->DB:Create a variable result and then use db.gorm.Where() and pass the "room_id IN" and the roomIds and use Find() and pass the address of the rooms model to fetch the multiple records at the same time
+                note over Repository
+                    db.Gorm.Where("room_id IN ?",roomIds).Find(&rooms)
+                end note
+                alt if result.Error is not nil
+                    Repository->Service: return the []models.Room as nil and the error field return dtos.error{} with status code and the message like failed to fetch room
+                end
+                Repository-->Service: return the rooms and error as nil to the service layer        
+            end
+            alt if err is not nil
+                Service-->Handler:create a api response with the status code 500 and denoted as internal server error and pass it to the handler
+                Handler-->Utils: Refer (62) WriteResponse(w, 500, APIResponse{Status:"Error", Message:"Internal server error"})
+                Utils-->Client: raise and forward the error to the client
+                note over Client
+                {
+                    code:500,
+                    status:"error",
+                    message:"Internal server error RoomId not exists",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note  
+            end
+            alt if len of the rooms is not equal to the len of the req.RoomIds
+                Service-->Handler:create a api response with the status code 500 and denoted as internal server error and pass it to the handler
+                Handler-->Utils: Refer (62) WriteResponse(w, 400, APIResponse{Status:"Error", Message:"Internal server error"})
+                Utils-->Client: raise and forward the error to the client
+                note over Client
+                {
+                    code:400,
+                    status:"error",
+                    message:"Internal server error one or more roomids are invalid",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note  
+            end  
+            Service->Repository: create a variable RoomAvail and err and call the function RoomAvailability() and pass the req.RoomIds,req.StartTime and req.EndTime to it
+            group RoomAvailability()
+                Repository->Repository: create a variable count with int64 type
+                Repository->DB: create a variable result and use db.Gorm.Tables() pass the name bookings table alias b here and joins this booking table with booking_rooms using booking_id and check the roomId is exists and the start_Time of the booking is less than the endtime of the user requested booking and the end_time in booking is greater than the startime requested by the customer and count it
+                note over Repository
+                    db.Gorm("bookings b").Joins("JOIN booking_rooms br ON br.booking_id=b.booking_id").
+                    Where("br.room_id IN?",roomIds).
+                    Where("b.start_Time<?",endtime).
+                    Where("b.end_time>?",StartTime).Count(&count)
+                end note
+                alt if result.Error is not nil
+                    Repository-->Service: return the  error field return dtos.error{} with status code and the message like failed to fetch room
+                end
+                alt if count is greater than zero
+                    Repository-->Service: return the error field return dtos.error{} with the status code and the message like one on more rooms already booked for selected time
+                end
+                Repository-->Service: Otherwise return only nil to the service layer which means the user entered time for booking the room is available
+            end
+            alt if not RoomAvail
+                Service-->Handler: create a error api response and get the error status code and the message and send it to the handler
+                Handler-->Utils: refer (62) for WriteResponse()
+                Utils-->Client: raise and forward the error message to the client
+                note over Client
+                {
+                    code:500,
+                    status:"error",
+                    message:"Internal server error room is not available",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note
+            end  
+            Service->Service: create a variable bookings and use &models.Bookings{} and assign the customerId, req.StartTime,req.EndTime,Status as booked
+            Service->Repository: create a variable err and call the function CreateBooking() and pass the bookings to it
+            group CreateBooking()
+                Repository->Repository: create a variable result and db.Gorm() and Create() booking to it
+                note over Repository
+                    db.Gorm.Create(bookings)
+                end note
+                alt if result.Error is not nil
+                    Repository-->Service: return the  error field return dtos.error{} with status code and the message like failed to create booking
+                end
+                Repository-->Service: return nil value to the service layer which means create booking is done without error
+            end
+            alt if err is not nil
+                 Service-->Handler: create a error api response and get the error status code and the message and send it to the handler
+                Handler-->Utils: refer (62) for WriteResponse()
+                Utils-->Client: raise and forward the error message to the client
+                note over Client
+                {
+                    code:500,
+                    status:"error",
+                    message:"Internal server error booking is failed",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note
+            end
+            Service->Service: create a variable bookingRooms empty slice and assign the []models.BookingRooms to it
+            alt for loop block range the req.RoomIds
+                Service->Service: use the bookingRooms slice and append the each roomId against the same bookingId within the slice using append()
+            end
+            Service->Repository: create a variable err and call the function CreateBookingRooms() and pass the bookingRooms slice data to it
+            group CreateBookingRooms()
+                Repository->DB: create a variable result and use db.Gorm() and use Create() function and pass the &bookingRooms to it
+                deactivate DB
+                note over Repository
+                    db.Gorm().Create(&bookingRooms)
+                end note
+                alt if result.Error is not nil
+                    Repository-->Service: return the  error field return dtos.error{} with status code and the message like failed to create booking rooms
+                end
+                Repository-->Service: return nil value to the service layer which means create booking rooms is done without error
+                deactivate Repository
+            end
+            alt if err is not nil
+                 Service-->Handler: create a error api response and get the error status code and the message and send it to the handler
+                Handler-->Utils: refer (62) for WriteResponse()
+                Utils-->Client: raise and forward the error message to the client
+                note over Client
+                {
+                    code:500,
+                    status:"error",
+                    message:"Internal server error booking room is failed",
+                    data:None,
+                    error:{"type": "HandlerException", "details": str(e)},
+                    request_id:request_id,
+                    timestamp: timestamp,
+                }
+                end note
+            end
+            Service->Service: create a variable duration and Subtract the req.EndTime with the req.StartTime using Sub()
+            Service->Service: create a variable hours and find the duration.Hours()
+            Service->Service: create a variable totalPrice with the float64 datatype
+            alt for loop block range the rooms
+                Service->Service: append the room.price*hours to the totalPrice
+            end
+            Service->Service: create APIResponse with status Success with the code 201
+            Service->Service: assign message as Room booked successfully
+            Service->Service: assign timestamp using time.Now().UTC().Format(time.RFC3339)
+            Service->Service: pass the bookingID, roomIds, booking status as booked and the total price
+            Service-->Handler: return APIResponse success response
+            deactivate Service
+        end
+        Handler->Utils: call MapErrorCode(apiResponse)
+        group MapErrorCode()
+           
+            Utils->Utils: inspect apiResponse.Errors[0].Code
+            Utils->Utils: map business error codes into proper HTTP status code
+            Utils->Utils: for success response assign HTTP 200
+            Utils-->Handler: return updated response with proper status code
+ 
+        end
+        Handler->Utils: call WriteResponse(w,response.Code,apiResponse)
+        deactivate Handler
+        group WriteResponse()
+            Utils->Utils: use w.Header().Set() and assign Content-Type as application/json
+            Utils->Utils: use w.WriteHeader() and pass the response code
+            Utils->Utils: use json.NewEncoder(w).Encode(apiResponse)
+        end
+    end
+Utlis-->Client: HTTP 201 OK
+deactivate Utils
+note over Client
+{
+  "status": "Success",
+  "code": 201,
+  "message": "room booked successfully",
+  "data": {
+    "booking_id": "101",
+    "room_ids": [1, 2],
+    "booking_status": "booked",
+    "price": 5000
+  }
+  "request_id" : "ncbdcnagcoahciuaiec97"
+  "timestamp": "2026-05-08T10:11:13Z",
+}
+end note
